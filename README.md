@@ -1,3 +1,3 @@
 # DBTransfer
-from dataSrc to dataDsc
-qwerqwerwqer
+Tranfer DatabaseSource to DatabaseDestination 
+Version v1.0
