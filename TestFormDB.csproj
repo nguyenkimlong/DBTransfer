@@ -1,0 +1,372 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{1ABE2338-5FA4-4589-9A51-149269BE0143}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>TestFormDB</RootNamespace>
+    <AssemblyName>TestFormDB</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Gakuseisean-Ivista-2-Misc-Web-Database.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Dapper, Version=1.38.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Dapper.1.38\lib\net45\Dapper.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.0\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.MappingAPI, Version=6.1.0.9, Culture=neutral, PublicKeyToken=7ee2e825d201459e, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.MappingAPI.6.1.0.9\lib\net45\EntityFramework.MappingAPI.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.SqlServer.ConnectionInfo, Version=12.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <HintPath>..\packages\Unofficial.Microsoft.SQLServer.SMO.2014.12.0.2000.8\lib\Microsoft.SqlServer.ConnectionInfo.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.SqlServer.ConnectionInfoExtended, Version=12.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <HintPath>..\packages\Unofficial.Microsoft.SQLServer.SMO.2014.12.0.2000.8\lib\Microsoft.SqlServer.ConnectionInfoExtended.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.SqlServer.Management.Sdk.Sfc, Version=12.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <HintPath>..\packages\Unofficial.Microsoft.SQLServer.SMO.2014.12.0.2000.8\lib\Microsoft.SqlServer.Management.Sdk.Sfc.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.SqlServer.Smo, Version=12.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <HintPath>..\packages\Unofficial.Microsoft.SQLServer.SMO.2014.12.0.2000.8\lib\Microsoft.SqlServer.Smo.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.SqlServer.SmoExtended, Version=12.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <HintPath>..\packages\Unofficial.Microsoft.SQLServer.SMO.2014.12.0.2000.8\lib\Microsoft.SqlServer.SmoExtended.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.SqlServer.SqlClrProvider, Version=12.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <HintPath>..\packages\Unofficial.Microsoft.SQLServer.SMO.2014.12.0.2000.8\lib\Microsoft.SqlServer.SqlClrProvider.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.SqlServer.SqlEnum, Version=12.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <HintPath>..\packages\Unofficial.Microsoft.SQLServer.SMO.2014.12.0.2000.8\lib\Microsoft.SqlServer.SqlEnum.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ConnectSQL.cs" />
+    <Compile Include="DataDetail.cs" />
+    <Compile Include="DataTransfer.cs" />
+    <Compile Include="ExportDataToTemp\FormWelcome.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ExportDataToTemp\FormWelcome.Designer.cs">
+      <DependentUpon>FormWelcome.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ExportDataToTemp\FrmCheckPosted.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ExportDataToTemp\FrmCheckPosted.Designer.cs">
+      <DependentUpon>FrmCheckPosted.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ExportDataToTemp\FrmFilterData.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ExportDataToTemp\FrmFilterData.Designer.cs">
+      <DependentUpon>FrmFilterData.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ExportDataToTemp\FrmFinishTransferData.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ExportDataToTemp\FrmFinishTransferData.Designer.cs">
+      <DependentUpon>FrmFinishTransferData.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ExportDataToTemp\FrmInforExportData.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ExportDataToTemp\FrmInforExportData.Designer.cs">
+      <DependentUpon>FrmInforExportData.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ExportDataToTemp\FrmListTableSource.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ExportDataToTemp\FrmListTableSource.Designer.cs">
+      <DependentUpon>FrmListTableSource.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ExportDataToTemp\FrmTransferDataExport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ExportDataToTemp\FrmTransferDataExport.Designer.cs">
+      <DependentUpon>FrmTransferDataExport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ExportDataToTemp\FrmTransferDesData.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ExportDataToTemp\FrmTransferDesData.Designer.cs">
+      <DependentUpon>FrmTransferDesData.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormMain.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormMain.Designer.cs">
+      <DependentUpon>FormMain.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ImportFromDataTemp\FilterImportData.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ImportFromDataTemp\FilterImportData.Designer.cs">
+      <DependentUpon>FilterImportData.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ImportFromDataTemp\FrmChkPostedImport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ImportFromDataTemp\FrmChkPostedImport.Designer.cs">
+      <DependentUpon>FrmChkPostedImport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ImportFromDataTemp\FrmDscDatabase.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ImportFromDataTemp\FrmDscDatabase.Designer.cs">
+      <DependentUpon>FrmDscDatabase.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ImportFromDataTemp\FrmFinishImport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ImportFromDataTemp\FrmFinishImport.Designer.cs">
+      <DependentUpon>FrmFinishImport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ImportFromDataTemp\FrmInforImport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ImportFromDataTemp\FrmInforImport.Designer.cs">
+      <DependentUpon>FrmInforImport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ImportFromDataTemp\FrmListData.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ImportFromDataTemp\FrmListData.Designer.cs">
+      <DependentUpon>FrmListData.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ImportFromDataTemp\FrmSrcDatabase.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ImportFromDataTemp\FrmSrcDatabase.Designer.cs">
+      <DependentUpon>FrmSrcDatabase.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ImportFromDataTemp\FrmWelcomeImport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ImportFromDataTemp\FrmWelcomeImport.Designer.cs">
+      <DependentUpon>FrmWelcomeImport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Main.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Main.Designer.cs">
+      <DependentUpon>Main.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TransferMasterData\Form1.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TransferMasterData\Form1.Designer.cs">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TransferMasterData\FrmFinishTransfer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TransferMasterData\FrmFinishTransfer.Designer.cs">
+      <DependentUpon>FrmFinishTransfer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TransferMasterData\FrmInfoTransfer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TransferMasterData\FrmInfoTransfer.Designer.cs">
+      <DependentUpon>FrmInfoTransfer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TransferMasterData\FrmWelcomeMaster.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TransferMasterData\FrmWelcomeMaster.Designer.cs">
+      <DependentUpon>FrmWelcomeMaster.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TransferMasterData\ListTable.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TransferMasterData\ListTable.Designer.cs">
+      <DependentUpon>ListTable.cs</DependentUpon>
+    </Compile>
+    <Compile Include="LogWriter.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TransferMasterData\TransferDB.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TransferMasterData\TransferDB.Designer.cs">
+      <DependentUpon>TransferDB.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Update Data\FrmAdjustData.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Update Data\FrmAdjustData.Designer.cs">
+      <DependentUpon>FrmAdjustData.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Update Data\FrmEditDataImport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Update Data\FrmEditDataImport.Designer.cs">
+      <DependentUpon>FrmEditDataImport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Update Data\FrmSrcUpdate.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Update Data\FrmSrcUpdate.Designer.cs">
+      <DependentUpon>FrmSrcUpdate.cs</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="ExportDataToTemp\FormWelcome.resx">
+      <DependentUpon>FormWelcome.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ExportDataToTemp\FrmCheckPosted.resx">
+      <DependentUpon>FrmCheckPosted.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ExportDataToTemp\FrmFilterData.resx">
+      <DependentUpon>FrmFilterData.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ExportDataToTemp\FrmFinishTransferData.resx">
+      <DependentUpon>FrmFinishTransferData.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ExportDataToTemp\FrmInforExportData.resx">
+      <DependentUpon>FrmInforExportData.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ExportDataToTemp\FrmListTableSource.resx">
+      <DependentUpon>FrmListTableSource.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ExportDataToTemp\FrmTransferDataExport.resx">
+      <DependentUpon>FrmTransferDataExport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ExportDataToTemp\FrmTransferDesData.resx">
+      <DependentUpon>FrmTransferDesData.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormMain.resx">
+      <DependentUpon>FormMain.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ImportFromDataTemp\FilterImportData.resx">
+      <DependentUpon>FilterImportData.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ImportFromDataTemp\FrmChkPostedImport.resx">
+      <DependentUpon>FrmChkPostedImport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ImportFromDataTemp\FrmDscDatabase.resx">
+      <DependentUpon>FrmDscDatabase.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ImportFromDataTemp\FrmFinishImport.resx">
+      <DependentUpon>FrmFinishImport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ImportFromDataTemp\FrmInforImport.resx">
+      <DependentUpon>FrmInforImport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ImportFromDataTemp\FrmListData.resx">
+      <DependentUpon>FrmListData.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ImportFromDataTemp\FrmSrcDatabase.resx">
+      <DependentUpon>FrmSrcDatabase.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ImportFromDataTemp\FrmWelcomeImport.resx">
+      <DependentUpon>FrmWelcomeImport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Main.resx">
+      <DependentUpon>Main.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TransferMasterData\Form1.resx">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TransferMasterData\FrmFinishTransfer.resx">
+      <DependentUpon>FrmFinishTransfer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TransferMasterData\FrmInfoTransfer.resx">
+      <DependentUpon>FrmInfoTransfer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TransferMasterData\FrmWelcomeMaster.resx">
+      <DependentUpon>FrmWelcomeMaster.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TransferMasterData\ListTable.resx">
+      <DependentUpon>ListTable.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <EmbeddedResource Include="TransferMasterData\TransferDB.resx">
+      <DependentUpon>TransferDB.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Update Data\FrmAdjustData.resx">
+      <DependentUpon>FrmAdjustData.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Update Data\FrmEditDataImport.resx">
+      <DependentUpon>FrmEditDataImport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Update Data\FrmSrcUpdate.resx">
+      <DependentUpon>FrmSrcUpdate.cs</DependentUpon>
+    </EmbeddedResource>
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\sql.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Gakuseisean-Ivista-2-Misc-Web-Database.ico" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
