@@ -190,7 +190,7 @@ namespace TestFormDB.ExportDataToTemp
                             {
                                 row["CustomBatch"] = row["BatchNo"].ToString() + " " + row["BatchDesc"].ToString();
                             }
-                        }
+                        }   
 
                         cbbBatchNo.DataSource = ds.Tables[0];
                         cbbBatchNo.DisplayMember = "CustomBatch";
