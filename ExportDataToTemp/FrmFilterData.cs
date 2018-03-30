@@ -15,6 +15,7 @@ namespace TestFormDB.ExportDataToTemp
         private List<DataDetail> data = new List<DataDetail>();
 
         List<Detail> detail = new List<Detail>();
+        string server, username, pass, database;
         public FrmFilterData()
         {
             InitializeComponent();
@@ -84,8 +85,113 @@ namespace TestFormDB.ExportDataToTemp
             }
         }
 
+        public void CheckData()
+        {
+            try
+            {
+                string conString = "Data Source=" + server + ";Database=" + database + ";User Id=" + username + ";Password=" + pass + "; pooling=false";
+                DataTable dtLockData = new DataTable();
+                DataTable dtdata = new DataTable();
+                using (SqlConnection conn = new SqlConnection(conString))
+                {
+                    conn.Open();
+
+                    using (SqlCommand cmd = new SqlCommand("select * from AD_tblLockDataParameter", conn))
+                    {
+                        dtLockData.Load(cmd.ExecuteReader());
+                    }
+                    string Condition;
+                    if (data[0].Condition !=null)
+                    {
+                        Condition = data[0].Condition + " and ";
+                    }
+                    else
+                        Condition = "";
+                    using (SqlCommand cmd1 = new SqlCommand())
+                    {
+                        cmd1.Connection = conn;
+                        cmd1.CommandType = CommandType.Text;
+                        if (chkDocDate.Checked && chkBatchNo.Checked)
+                        {
+                            cmd1.CommandText = "select * from " + data[0].Table + " Where " + Condition + "  DocumentDate between '" + dtpfromdate.Value.ToShortDateString() + "' and '" + dtptodate.Value.ToShortDateString() + "' and BatchNo ='" + cbbBatchNo.SelectedValue.ToString().Trim() + "'";
+                            dtdata.Load(cmd1.ExecuteReader());
+                            if (dtdata.Rows.Count <= 0)
+                            {
+                                MessageBox.Show("Không có dữ liệu");
+                                return ;
+                            }
+                            else
+                            {
+                                foreach (DataRow row in dtLockData.Rows)
+                                {
+                                    if (row["FunctionID"].ToString() == data[0].ID)
+                                    {
+                                        foreach (DataRow rowdata in dtdata.Rows)
+                                        {
+                                            
+                                        }
+                                        break;
+                                    }                                 
+                                }
+                            }
+                        }
+
+                        else if (chkBatchNo.Checked)
+                        {
+                            cmd1.CommandText = "select * from " + data[0].Table + " Where " + Condition + "  BatchNo ='" + cbbBatchNo.SelectedValue.ToString().Trim() + "'";
+                            dtdata.Load(cmd1.ExecuteReader());
+                            if (dtdata.Rows.Count <= 0)
+                            {
+                                MessageBox.Show("Không có dữ liệu");
+                                return ;
+                            }
+                            else
+                            {
+
+                            }
+                        }
+                        else if (chkDocDate.Checked)
+                        {
+                            cmd1.CommandText = "select * from " + data[0].Table + " Where " + Condition + "  DocumentDate between '" + dtpfromdate.Value.ToShortDateString() + "' and '" + dtptodate.Value.ToShortDateString() + "'";
+                            dtdata.Load(cmd1.ExecuteReader());
+                            if (dtdata.Rows.Count <= 0)
+                            {
+                                MessageBox.Show("Không có dữ liệu");
+                                return ;
+                            }
+                            else
+                            {
+
+                            }
+                        }
+                        else
+                        {
+                            cmd1.CommandText = "select * from " + data[0].Table+ " Where " + Condition;
+                            dtdata.Load(cmd1.ExecuteReader());
+                            if (dtdata.Rows.Count <= 0)
+                            {
+                                MessageBox.Show("Không có dữ liệu");
+                                return ;
+                            }
+                            else
+                            {
+
+                            }
+                        }
+                    }
+                }              
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi: ",ex.Message);
+            }
+        }
+
         private void btnNext_Click(object sender, EventArgs e)
         {
+
+
+
             XmlWriterSettings settings = new XmlWriterSettings();
             settings.Indent = true;
 
@@ -104,13 +210,13 @@ namespace TestFormDB.ExportDataToTemp
                 writer.WriteElementString("Language", item.Language);
                 if (chkDocDate.Checked && chkBatchNo.Checked)
                 {
-                    writer.WriteElementString("Condition", item.Condition + " And DocumentDate between '" + dtpfromdate.Value.ToShortDateString() + "' and '" + dtptodate.Value.ToShortDateString() + "' and BatchNo ='" + cbbBatchNo.SelectedValue.ToString() + "'");
+                    writer.WriteElementString("Condition", item.Condition + " And DocumentDate between '" + dtpfromdate.Value.ToShortDateString() + "' and '" + dtptodate.Value.ToShortDateString() + "' and BatchNo ='" + cbbBatchNo.SelectedValue.ToString().Trim() + "'");
                 }
                 else
                 {
                     if (chkBatchNo.Checked)
                     {
-                        writer.WriteElementString("Condition", item.Condition + " and BatchNo ='" + cbbBatchNo.SelectedValue.ToString() + "'");
+                        writer.WriteElementString("Condition", item.Condition + " and BatchNo ='" + cbbBatchNo.SelectedValue.ToString().Trim() + "'");
                     }
                     else if (chkDocDate.Checked)
                     {
@@ -143,6 +249,8 @@ namespace TestFormDB.ExportDataToTemp
             writer.Flush();
             writer.Close();
 
+
+
             FrmCheckPosted frmCheckPosted = new FrmCheckPosted();
             Hide();
             frmCheckPosted.Show();
@@ -152,7 +260,7 @@ namespace TestFormDB.ExportDataToTemp
         {
             try
             {
-                string server, username, pass, database;
+
                 XmlDocument doc = new XmlDocument();
                 doc.Load(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location) + "\\configSrc.xml");
 
@@ -180,7 +288,7 @@ namespace TestFormDB.ExportDataToTemp
                         dt.Columns.Add("CustomBatch", typeof(string));
                         foreach (DataRow row in dt.Rows)
                         {
-                            if (row["BatchNo"].ToString().Length <=20)
+                            if (row["BatchNo"].ToString().Length <= 20)
                             {
                                 var i = 20 - row["BatchNo"].ToString().Length;
                                 row["BatchNo"] = row["BatchNo"].ToString() + string.Concat(Enumerable.Repeat("  ", i));
@@ -190,7 +298,7 @@ namespace TestFormDB.ExportDataToTemp
                             {
                                 row["CustomBatch"] = row["BatchNo"].ToString() + " " + row["BatchDesc"].ToString();
                             }
-                        }   
+                        }
 
                         cbbBatchNo.DataSource = ds.Tables[0];
                         cbbBatchNo.DisplayMember = "CustomBatch";

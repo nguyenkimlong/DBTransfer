@@ -57,40 +57,7 @@ namespace TestFormDB
         {
           
         }
-
-        public List<string> GetDatabaseList()
-        {
-            try
-            {
-                List<string> list = new List<string>();
-
-                // Open connection to the database
-                string conString = "Data Source=" + txtserver.Text + ";Database=" + cbbDatabase.Text + ";User Id=" + txtUsername.Text + ";Password=" + txtPassword.Text + "; pooling=false";
-
-                using (SqlConnection con = new SqlConnection(conString))
-                {
-                    con.Open();
-
-                    // Set up a command with the given query and associate
-                    // this with the current connection.
-                    using (SqlCommand cmd = new SqlCommand("SELECT name from sys.databases", con))
-                    {
-                        using (IDataReader dr = cmd.ExecuteReader())
-                        {
-                            while (dr.Read())
-                            {
-                                list.Add(dr[0].ToString());
-                            }
-                        }
-                    }
-                }
-                return list;
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-        }
+      
 
         private void Form1_Load(object sender, EventArgs e)
         {
@@ -116,7 +83,7 @@ namespace TestFormDB
 
         private void btnRefresh_Click(object sender, EventArgs e)
         {
-            cbbDatabase.DataSource = GetDatabaseList();
+            cbbDatabase.DataSource = GetDatabase.GetDatabaseList(txtserver.Text, null, txtUsername.Text, txtPassword.Text);
         }
         private void button1_Click(object sender, EventArgs e)
         {

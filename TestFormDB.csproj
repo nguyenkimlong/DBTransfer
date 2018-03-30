@@ -146,6 +146,7 @@
     <Compile Include="FormMain.Designer.cs">
       <DependentUpon>FormMain.cs</DependentUpon>
     </Compile>
+    <Compile Include="GetDatabase.cs" />
     <Compile Include="ImportFromDataTemp\FilterImportData.cs">
       <SubType>Form</SubType>
     </Compile>

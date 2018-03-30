@@ -92,7 +92,7 @@ namespace TestFormDB.Update_Data
         }
         public void LoadDataTable()
         {
-            string str = "Data Source=" + "172.16.7.56\\SQL2016" + ";Database=" + "AccNetERP" + ";User Id=" + "sa" + ";Password=" + "Lacviet@123" + "; pooling=false";
+            string str = "Data Source=" + SrcServerName + ";Database=" + SrcDatabase + ";User Id=" + SrcUserName + ";Password=" + SrcPassword + "; pooling=false";
 
             using (SqlConnection sourceConnection = new SqlConnection(str))
             {
@@ -836,7 +836,7 @@ namespace TestFormDB.Update_Data
                         foreach (var item in detail)
                         {
                             string query = "";
-                            query = "Select T2.DocumentDate,T1.* ";
+                            query = "Select T2.DocumentDate ,T1.* ";
                             query += "From " + "zzzlvimport" + item.DetailName + " T1, " + "zzzlvimport" + data[0].Table + " T2 ";
                             query += " Where " + " T1." + item.ConditionDetail + " = " + " T2." + item.ConditionDetail;
                             query += " Order by T2.DocumentDate desc";
@@ -972,11 +972,17 @@ namespace TestFormDB.Update_Data
             }
         }
 
-        public void CopyTable(SqlConnection conn, DataTable dt, string tablename)
+        public void CopyTable(SqlConnection conn, DataTable dt, string tablename, List<string> ColumnNotMap = null)
         {
             var tran = conn.BeginTransaction();
             try
             {
+               
+                if(detail.Where(o=>o.DetailName == tablename).Any())
+                {
+                    if (ColumnNotMap == null) ColumnNotMap = new List<string>();
+                    ColumnNotMap.Add("DocumentDate");
+                }
                 string sqlTrunc = "TRUNCATE TABLE zzzlvimport" + tablename;
                 SqlCommand cmd = new SqlCommand(sqlTrunc, conn);
                 cmd.Transaction = tran;
@@ -984,6 +990,12 @@ namespace TestFormDB.Update_Data
 
                 using (SqlBulkCopy bulkCopy = new SqlBulkCopy(conn, SqlBulkCopyOptions.KeepIdentity | SqlBulkCopyOptions.KeepNulls, tran))
                 {
+
+                    foreach (DataColumn item in dt.Columns)
+                    {
+                        if(ColumnNotMap==null || !ColumnNotMap.Contains(item.ColumnName))
+                            bulkCopy.ColumnMappings.Add(item.ColumnName, item.ColumnName);
+                    }
                     bulkCopy.DestinationTableName = "zzzlvimport" + tablename;
                     bulkCopy.WriteToServer(dt);
                     bulkCopy.Close();
@@ -1016,7 +1028,7 @@ namespace TestFormDB.Update_Data
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi: ", ex.Message);
+                MessageBox.Show("Lỗi: "+ ex.Message);
             }
 
 
