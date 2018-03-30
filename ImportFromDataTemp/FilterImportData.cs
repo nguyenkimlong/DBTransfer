@@ -161,11 +161,28 @@ namespace TestFormDB.ImportFromDataTemp
                     // this with the current connection.
                     using (SqlCommand cmd = new SqlCommand("SELECT BatchNo,BatchDesc from GL_tblBatchList", con))
                     {
+                        DataTable dt = new DataTable();
                         var adapter = new SqlDataAdapter(cmd);
                         var ds = new DataSet();
                         adapter.Fill(ds);
+                        dt = ds.Tables[0];
+                        dt.Columns.Add("CustomBatch", typeof(string));
+                        foreach (DataRow row in dt.Rows)
+                        {
+                            if (row["BatchNo"].ToString().Length <= 20)
+                            {
+                                var i = 20 - row["BatchNo"].ToString().Length;
+                                row["BatchNo"] = row["BatchNo"].ToString() + string.Concat(Enumerable.Repeat("  ", i));
+                                row["CustomBatch"] = row["BatchNo"].ToString() + " " + row["BatchDesc"].ToString();
+                            }
+                            else
+                            {
+                                row["CustomBatch"] = row["BatchNo"].ToString() + " " + row["BatchDesc"].ToString();
+                            }
+                        }
                         cbbBatchNo.DataSource = ds.Tables[0];
-                        cbbBatchNo.DisplayMember = "BatchDesc";
+
+                        cbbBatchNo.DisplayMember = "CustomBatch";
                         cbbBatchNo.ValueMember = "BatchNo";
                     }
                 }

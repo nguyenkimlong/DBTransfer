@@ -169,6 +169,7 @@ namespace TestFormDB
             var tran = conn.BeginTransaction();
             try
             {
+
                 SqlCommand cmd1 = new SqlCommand();
                 cmd1.CommandType = CommandType.Text;
                 cmd1.Connection = conn;
@@ -208,26 +209,13 @@ namespace TestFormDB
                 if (string.IsNullOrEmpty(keyCol)) keyCol = "DocumentID";
 
                 //change code
-                if (overwrite)
-                {
-                    if (!string.IsNullOrEmpty(tableDetail))
-                    {
-                        cmd1.CommandText = "DELETE M FROM #zzzlvimport" + tablename + " T INNER JOIN " + tableDetail + " M ON T." + keyCol + "= M." + keyCol + " \r\n";
-                        cmd1.ExecuteNonQuery();
-                    }
 
-                    cmd1.CommandText = "DELETE M FROM #zzzlvimport" + tablename + " T INNER JOIN " + tablename + " M ON T." + keyCol + "= M." + keyCol + " \r\n";
-                    cmd1.ExecuteNonQuery();
+                cmd1.CommandText = "INSERT INTO " + tablename + "(" + insertString + ") SELECT " + insertStringAlias + " FROM #zzzlvimport" + tablename + " T LEFT JOIN " + tablename + " M ON T." + keyCol + "= M." + keyCol + " WHERE M." + keyCol + " IS NULL";
 
-                    cmd1.CommandText = "INSERT INTO " + tablename + "(" + insertString + ") SELECT " + insertStringAlias + " FROM #zzzlvimport" + tablename + " T ";
-                }
-                else
-                {
-                    cmd1.CommandText = "INSERT INTO " + tablename + "(" + insertString + ") SELECT " + insertStringAlias + " FROM #zzzlvimport" + tablename + " T LEFT JOIN " + tablename + " M ON T." + keyCol + "= M." + keyCol + " WHERE M." + keyCol + " IS NULL";
-                }
 
                 cmd1.ExecuteNonQuery();
                 tran.Commit();
+             
             }
             catch (Exception exp)
             {
@@ -268,7 +256,7 @@ namespace TestFormDB
 
         private void btnSavelog_Click(object sender, EventArgs e)
         {
-            LogWriter log = new LogWriter(richTextBox1.Text,"log");
+            LogWriter log = new LogWriter(richTextBox1.Text, "log");
             MessageBox.Show("Lưu File thành công");
         }
 

@@ -37,12 +37,12 @@
             this.lstwtable = new System.Windows.Forms.ListView();
             this.label1 = new System.Windows.Forms.Label();
             this.panel3 = new System.Windows.Forms.Panel();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.label2 = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.panel3.SuspendLayout();
-            this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // chkoverwrite
@@ -55,6 +55,7 @@
             this.chkoverwrite.TabIndex = 3;
             this.chkoverwrite.Text = "Overwrite Exist Data";
             this.chkoverwrite.UseVisualStyleBackColor = true;
+            this.chkoverwrite.Visible = false;
             // 
             // btncancel
             // 
@@ -140,6 +141,16 @@
             this.panel3.Size = new System.Drawing.Size(704, 83);
             this.panel3.TabIndex = 40;
             // 
+            // pictureBox1
+            // 
+            this.pictureBox1.Image = global::TestFormDB.Properties.Resources.sql;
+            this.pictureBox1.Location = new System.Drawing.Point(603, 10);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(87, 62);
+            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.pictureBox1.TabIndex = 14;
+            this.pictureBox1.TabStop = false;
+            // 
             // label2
             // 
             this.label2.AutoSize = true;
@@ -164,16 +175,6 @@
             this.panel1.Size = new System.Drawing.Size(704, 57);
             this.panel1.TabIndex = 41;
             // 
-            // pictureBox1
-            // 
-            this.pictureBox1.Image = global::TestFormDB.Properties.Resources.sql;
-            this.pictureBox1.Location = new System.Drawing.Point(603, 10);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(87, 62);
-            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.pictureBox1.TabIndex = 14;
-            this.pictureBox1.TabStop = false;
-            // 
             // ListTable
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -193,9 +194,9 @@
             this.Load += new System.EventHandler(this.ListTable_Load);
             this.panel3.ResumeLayout(false);
             this.panel3.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
