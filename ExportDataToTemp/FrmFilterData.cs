@@ -190,7 +190,6 @@ namespace TestFormDB.ExportDataToTemp
                             {
                                 row["CustomBatch"] = row["BatchNo"].ToString() + " " + row["BatchDesc"].ToString();
                             }
-                         
                         }
 
                         cbbBatchNo.DataSource = ds.Tables[0];
@@ -198,7 +197,6 @@ namespace TestFormDB.ExportDataToTemp
                         cbbBatchNo.ValueMember = "BatchNo";
                     }
                 }
-
             }
             catch (Exception ex)
             {
