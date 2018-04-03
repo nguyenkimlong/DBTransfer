@@ -4,6 +4,7 @@ using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 using System.Xml;
+using TestFormDB.TransferMasterData;
 
 namespace TestFormDB
 {
@@ -28,7 +29,7 @@ namespace TestFormDB
 
         private void btnback_Click(object sender, EventArgs e)
         {
-            TransferDB transfer = new TransferDB();
+            FrmWelcomeMaster transfer = new FrmWelcomeMaster();
             Hide();
             transfer.Show();
         }

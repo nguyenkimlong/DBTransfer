@@ -44,7 +44,7 @@ namespace TestFormDB
                     break;
 
                 case "rdbtnUpdate":
-                    FrmSrcUpdate srcUpdate = new FrmSrcUpdate();
+                    FrmAdjustData srcUpdate = new FrmAdjustData();
                     this.Hide();
                     srcUpdate.Show();
                     break;
@@ -79,6 +79,12 @@ namespace TestFormDB
             Main main = new Main();
             Hide();
             main.Show();
+        }
+
+        private void btnthietlap_Click(object sender, EventArgs e)
+        {
+            FrmConnect frmConnect = new FrmConnect();
+            frmConnect.ShowDialog();
         }
     }
 }

@@ -24,7 +24,7 @@ namespace TestFormDB.ImportFromDataTemp
 
         private void btnback_Click(object sender, EventArgs e)
         {
-            FrmDscDatabase frmTransferDes = new FrmDscDatabase();
+            FrmWelcomeImport frmTransferDes = new FrmWelcomeImport();
             Hide();
             frmTransferDes.Show();
         }

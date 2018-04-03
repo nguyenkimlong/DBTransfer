@@ -83,6 +83,7 @@ namespace TestFormDB.ImportFromDataTemp
                 writer.WriteElementString("Table", item.Table);
                 writer.WriteElementString("Condition", item.Condition);
                 writer.WriteElementString("Language", item.Language);
+           
                 foreach (var itemdetail in detail)
                 {
                     if (itemdetail.ID == item.ID)
@@ -97,12 +98,9 @@ namespace TestFormDB.ImportFromDataTemp
                 }
 
                 writer.WriteEndElement();
-                if (chkPosted.Checked)
-                {
-                    writer.WriteElementString("Posted", chkPosted.Checked.ToString());
-                }
-                else
-                    writer.WriteElementString("Posted", "");
+                writer.WriteElementString("OverWrite", chkoverwrite.Checked.ToString());
+                writer.WriteElementString("Posted", chkPosted.Checked.ToString());
+              
             }
             writer.WriteEndElement();
             writer.WriteEndDocument();

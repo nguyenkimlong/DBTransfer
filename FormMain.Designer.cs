@@ -42,6 +42,7 @@
             this.panel2 = new System.Windows.Forms.Panel();
             this.btnBack = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
+            this.btnthietlap = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             this.panel3.SuspendLayout();
             this.flowLayoutPanel2.SuspendLayout();
@@ -164,6 +165,7 @@
             // panel2
             // 
             this.panel2.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.panel2.Controls.Add(this.btnthietlap);
             this.panel2.Controls.Add(this.btnBack);
             this.panel2.Controls.Add(this.btnCancel);
             this.panel2.Controls.Add(this.btnNext);
@@ -196,6 +198,22 @@
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
             this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
+            // 
+            // btnthietlap
+            // 
+            this.btnthietlap.BackColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.btnthietlap.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.btnthietlap.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnthietlap.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.btnthietlap.Image = ((System.Drawing.Image)(resources.GetObject("btnthietlap.Image")));
+            this.btnthietlap.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnthietlap.Location = new System.Drawing.Point(10, 17);
+            this.btnthietlap.Name = "btnthietlap";
+            this.btnthietlap.Size = new System.Drawing.Size(95, 23);
+            this.btnthietlap.TabIndex = 5;
+            this.btnthietlap.Text = "Thiết lập";
+            this.btnthietlap.UseVisualStyleBackColor = false;
+            this.btnthietlap.Click += new System.EventHandler(this.btnthietlap_Click);
             // 
             // FormMain
             // 
@@ -238,5 +256,6 @@
         private System.Windows.Forms.Button btnCancel;
         private System.Windows.Forms.Button btnBack;
         private System.Windows.Forms.PictureBox pictureBox1;
+        private System.Windows.Forms.Button btnthietlap;
     }
 }

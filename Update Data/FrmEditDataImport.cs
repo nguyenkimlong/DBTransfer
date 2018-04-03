@@ -768,7 +768,7 @@ namespace TestFormDB.Update_Data
                     SqlDataAdapter sqlDA, sqldata;
 
                     //DataTable Master
-                    string ListQuery = "Select * from zzzlvimport" + data[0].Table;
+                    string ListQuery = "Select * from zzzlvimport" + data[0].Table ;
                     sqldata = new SqlDataAdapter(ListQuery, sourceConnection);
                     var dsdata = new DataSet();
                     sqldata.Fill(dsdata);
@@ -786,8 +786,8 @@ namespace TestFormDB.Update_Data
                             string query = "";
                             query = "Select T2.DocumentDate,T1.* ";
                             query += "From " + "zzzlvimport" + item.DetailName + " T1, " + "zzzlvimport" + data[0].Table + " T2 ";
-                            query += " Where " + " T1." + item.ConditionDetail + " = " + " T2." + item.ConditionDetail + " and " + " DocumentDate Between '" + dtpFromDate.Value.ToShortDateString() + "' and '" + dtpToDate.Value.ToShortDateString() + "'";
-                            query += " Order by T2.DocumentDate desc";
+                            query += " Where " + " T1." + item.ConditionDetail + " = " + " T2." + item.ConditionDetail + " and " + data[0].Condition + " and " + " DocumentDate Between '" + dtpFromDate.Value.ToShortDateString() + "' and '" + dtpToDate.Value.ToShortDateString() + "'";
+                            query += " Order by T2.DocumentDate ";
                             sqlDA = new SqlDataAdapter(query, sourceConnection);
 
                             var ds = new DataSet();
@@ -804,8 +804,8 @@ namespace TestFormDB.Update_Data
                             string query = "";
                             query = "Select T2.DocumentDate,T1.* ";
                             query += "From " + "zzzlvimport" + item.DetailName + " T1, " + "zzzlvimport" + data[0].Table + " T2 ";
-                            query += " Where " + " T1." + item.ConditionDetail + " = " + " T2." + item.ConditionDetail + " and " + "T1.BatchNo=" + txtLoChungTu.Text + " and " + " DocumentDate Between '" + dtpFromDate.Value.ToShortDateString() + "' and '" + dtpToDate.Value.ToShortDateString() + "'";
-                            query += " Order by T2.DocumentDate desc";
+                            query += " Where " + " T1." + item.ConditionDetail + " = " + " T2." + item.ConditionDetail + " and " + data[0].Condition + " and " + "BatchNo='" + txtLoChungTu.Text+"'";
+                            query += " Order by T2.DocumentDate ";
                             sqlDA = new SqlDataAdapter(query, sourceConnection);
 
                             var ds = new DataSet();
@@ -821,8 +821,8 @@ namespace TestFormDB.Update_Data
                             string query = "";
                             query = "Select T2.DocumentDate,T1.* ";
                             query += "From " + "zzzlvimport" + item.DetailName + " T1, " + "zzzlvimport" + data[0].Table + " T2 ";
-                            query += " Where " + " T1." + item.ConditionDetail + " = " + " T2." + item.ConditionDetail + " and " + "T1.BatchNo=" + txtLoChungTu.Text;
-                            query += " Order by T2.DocumentDate desc";
+                            query += " Where " + " T1." + item.ConditionDetail + " = " + " T2." + item.ConditionDetail + " and " + data[0].Condition + " and " + "BatchNo='" + txtLoChungTu.Text + "' and " + " DocumentDate Between '" + dtpFromDate.Value.ToShortDateString() + "' and '" + dtpToDate.Value.ToShortDateString() + "'";
+                            query += " Order by T2.DocumentDate ";
                             sqlDA = new SqlDataAdapter(query, sourceConnection);
 
                             var ds = new DataSet();
@@ -838,8 +838,8 @@ namespace TestFormDB.Update_Data
                             string query = "";
                             query = "Select T2.DocumentDate ,T1.* ";
                             query += "From " + "zzzlvimport" + item.DetailName + " T1, " + "zzzlvimport" + data[0].Table + " T2 ";
-                            query += " Where " + " T1." + item.ConditionDetail + " = " + " T2." + item.ConditionDetail;
-                            query += " Order by T2.DocumentDate desc";
+                            query += " Where " + " T1." + item.ConditionDetail + " = " + " T2." + item.ConditionDetail + " and " +  data[0].Condition;
+                            query += " Order by T2.DocumentDate ";
                             sqlDA = new SqlDataAdapter(query, sourceConnection);
 
                             var ds = new DataSet();
@@ -916,7 +916,7 @@ namespace TestFormDB.Update_Data
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi: ", ex.Message);
+                MessageBox.Show("Lỗi: "+ ex.Message);
             }
         }
 
@@ -977,7 +977,7 @@ namespace TestFormDB.Update_Data
             var tran = conn.BeginTransaction();
             try
             {
-               
+               var a= dt.Rows.Count;
                 if(detail.Where(o=>o.DetailName == tablename).Any())
                 {
                     if (ColumnNotMap == null) ColumnNotMap = new List<string>();
@@ -998,6 +998,7 @@ namespace TestFormDB.Update_Data
                     }
                     bulkCopy.DestinationTableName = "zzzlvimport" + tablename;
                     bulkCopy.WriteToServer(dt);
+                    var b = dt.Rows.Count;
                     bulkCopy.Close();
                 }
                 tran.Commit();

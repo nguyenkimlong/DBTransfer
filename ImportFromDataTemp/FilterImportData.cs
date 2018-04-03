@@ -24,6 +24,10 @@ namespace TestFormDB.ImportFromDataTemp
             dtpfromdate.CustomFormat = "dd/MM/yyyy";
             dtptodate.CustomFormat = "dd/MM/yyyy";
             GetDatabaseList();
+            cbbBatchNo.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+            cbbBatchNo.AutoCompleteSource = AutoCompleteSource.ListItems;
+           
+          
         }
 
         private void btnBack_Click(object sender, EventArgs e)
@@ -103,7 +107,7 @@ namespace TestFormDB.ImportFromDataTemp
         }
 
         private void FilterImportData_Load(object sender, EventArgs e)
-        {
+        {           
             try
             {
                 XmlDocument docProcess = new XmlDocument();
@@ -140,20 +144,9 @@ namespace TestFormDB.ImportFromDataTemp
         public void GetDatabaseList()
         {
             try
-            {
-                string server, username, pass, database;
-                XmlDocument doc = new XmlDocument();
-                doc.Load(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location) + "\\configSrc.xml");
+            {              
 
-                server = doc.GetElementsByTagName("SrcServerName").Item(0).InnerText;
-                username = doc.GetElementsByTagName("SrcUserName").Item(0).InnerText;
-                pass = doc.GetElementsByTagName("SrcPassword").Item(0).InnerText;
-                database = doc.GetElementsByTagName("SrcDatabase").Item(0).InnerText;
-
-                // Open connection to the database
-                string conString = "Data Source=" + server + ";Database=" + database + ";User Id=" + username + ";Password=" + pass + "; pooling=false";
-
-                using (SqlConnection con = new SqlConnection(conString))
+                using (SqlConnection con = new SqlConnection(GetStrConnect.GetStrSrc()))
                 {
                     con.Open();
 
@@ -181,7 +174,7 @@ namespace TestFormDB.ImportFromDataTemp
                             }
                         }
                         cbbBatchNo.DataSource = ds.Tables[0];
-
+                     
                         cbbBatchNo.DisplayMember = "CustomBatch";
                         cbbBatchNo.ValueMember = "BatchNo";
                     }
@@ -224,5 +217,7 @@ namespace TestFormDB.ImportFromDataTemp
                 dtptodate.Enabled = false;
             }
         }
+
+       
     }
 }

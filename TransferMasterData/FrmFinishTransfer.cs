@@ -72,27 +72,7 @@ namespace TestFormDB
                 // Đọc File XML Data
                 XmlDocument docProcess = new XmlDocument();
                 docProcess.Load(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location) + "\\dataSrcCheck.xml");
-
-                // Đọc File XML data Nguồn
-                XmlDocument dataSrc = new XmlDocument();
-                dataSrc.Load(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location) + "\\configSrc.xml");
-                string SrcServerName = dataSrc.GetElementsByTagName("SrcServerName").Item(0).InnerText;
-                string SrcUserName = dataSrc.GetElementsByTagName("SrcUserName").Item(0).InnerText;
-                string SrcPassword = dataSrc.GetElementsByTagName("SrcPassword").Item(0).InnerText;
-                string SrcDatabase = dataSrc.GetElementsByTagName("SrcDatabase").Item(0).InnerText;
-
-                // Đọc File XML data Đích
-                XmlDocument dataDsc = new XmlDocument();
-                dataDsc.Load(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location) + "\\configDsc.xml");
-                string ServerName = dataDsc.GetElementsByTagName("ServerName").Item(0).InnerText;
-                string UserName = dataDsc.GetElementsByTagName("UserName").Item(0).InnerText;
-                string Password = dataDsc.GetElementsByTagName("Password").Item(0).InnerText;
-                string Database = dataDsc.GetElementsByTagName("Database").Item(0).InnerText;
-
-                string strSrc = "Data Source=" + SrcServerName + ";Database=" + SrcDatabase + ";User Id=" + SrcUserName + ";Password=" + SrcPassword + "; pooling=false";
-
-                string strDsc = "Data Source=" + ServerName + ";Database=" + Database + ";User Id=" + UserName + ";Password=" + Password + "; pooling=false";
-
+             
                 //lấy Table từ table sau khi check chọn
                 var Table = docProcess.GetElementsByTagName("Function");
 
@@ -109,7 +89,7 @@ namespace TestFormDB
                 var Overwrite = docProcess.GetElementsByTagName("Overwrite").Item(0).InnerText;
 
                 // kết nối data lấy dữ liệu bảng muốn chuyển
-                using (SqlConnection sourceConnection = new SqlConnection(strSrc))
+                using (SqlConnection sourceConnection = new SqlConnection(GetStrConnect.GetStrSrc()))
                 {
                     sourceConnection.Open();
 
@@ -145,7 +125,7 @@ namespace TestFormDB
                             column.Add(item.ToString());
                         }
 
-                        using (SqlConnection descConnection = new SqlConnection(strDsc))
+                        using (SqlConnection descConnection = new SqlConnection(GetStrConnect.GetStrDsc()))
                         {
                             descConnection.Open();
                             CopyData(descConnection, tableName.Table, ds.Tables[0], bool.Parse(Overwrite), openWith, tableName.Table, null, column[0]);

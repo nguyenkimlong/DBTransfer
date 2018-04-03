@@ -73,7 +73,7 @@ namespace TestFormDB.ExportDataToTemp
 
         private void btnback_Click(object sender, EventArgs e)
         {
-            FrmTransferDesData frmTransferDes = new FrmTransferDesData();
+            FormWelcome frmTransferDes = new FormWelcome();
             Hide();
             frmTransferDes.Show();
         }

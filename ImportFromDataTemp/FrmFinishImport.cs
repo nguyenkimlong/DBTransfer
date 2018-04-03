@@ -53,26 +53,6 @@ namespace TestFormDB.ImportFromDataTemp
                 XmlDocument docProcess = new XmlDocument();
                 docProcess.Load(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location) + "\\dataImportCheck.xml");
 
-                // Đọc File XML data Nguồn
-                XmlDocument dataSrc = new XmlDocument();
-                dataSrc.Load(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location) + "\\configSrc.xml");
-                string SrcServerName = dataSrc.GetElementsByTagName("SrcServerName").Item(0).InnerText;
-                string SrcUserName = dataSrc.GetElementsByTagName("SrcUserName").Item(0).InnerText;
-                string SrcPassword = dataSrc.GetElementsByTagName("SrcPassword").Item(0).InnerText;
-                string SrcDatabase = dataSrc.GetElementsByTagName("SrcDatabase").Item(0).InnerText;
-
-                // Đọc File XML data Đích
-                XmlDocument dataDsc = new XmlDocument();
-                dataDsc.Load(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location) + "\\configDsc.xml");
-                string ServerName = dataDsc.GetElementsByTagName("ServerName").Item(0).InnerText;
-                string UserName = dataDsc.GetElementsByTagName("UserName").Item(0).InnerText;
-                string Password = dataDsc.GetElementsByTagName("Password").Item(0).InnerText;
-                string Database = dataDsc.GetElementsByTagName("Database").Item(0).InnerText;
-
-                string strSrc = "Data Source=" + SrcServerName + ";Database=" + SrcDatabase + ";User Id=" + SrcUserName + ";Password=" + SrcPassword + "; pooling=false";
-
-                string strDsc = "Data Source=" + ServerName + ";Database=" + Database + ";User Id=" + UserName + ";Password=" + Password + "; pooling=false";
-
                 //lấy Table từ table sau khi check chọn
                 var Table = docProcess.GetElementsByTagName("Function");
 
@@ -95,9 +75,10 @@ namespace TestFormDB.ImportFromDataTemp
                     }
                 }
                 var Posted = docProcess.GetElementsByTagName("Posted").Item(0).InnerText;
+                var Overwrite = docProcess.GetElementsByTagName("OverWrite").Item(0).InnerText;
 
                 // kết nối data lấy dữ liệu bảng muốn chuyển
-                using (SqlConnection sourceConnection = new SqlConnection(strDsc))
+                using (SqlConnection sourceConnection = new SqlConnection(GetStrConnect.GetStrDsc()))
                 {
                     sourceConnection.Open();
 
@@ -139,10 +120,10 @@ namespace TestFormDB.ImportFromDataTemp
                             column.Add(item.ToString());
                         }
 
-                        using (SqlConnection descConnection = new SqlConnection(strDsc))
+                        using (SqlConnection descConnection = new SqlConnection(GetStrConnect.GetStrDsc()))
                         {
                             descConnection.Open();
-                            CopyData(descConnection, tableName.Table, ds.Tables[0], true, openWith, tableName.Table, null, column[0]);
+                            CopyData(descConnection, tableName.Table, ds.Tables[0], bool.Parse(Overwrite), openWith, tableName.Table, null, column[0]);
                             this.Invoke(OnUpdateLog, "Import " + tableName.Table + ", Rows: " + dataTable.Rows.Count);
                         }
                         //===========//
@@ -179,11 +160,11 @@ namespace TestFormDB.ImportFromDataTemp
                                     openWithDetail.Add(itemDetail.ToString(), itemDetail.ToString());
                                     columnDetail.Add(itemDetail.ToString());
                                 }
-
-                                using (SqlConnection descConnection = new SqlConnection(strDsc))
+                                var a = results.Rows.Count;
+                                using (SqlConnection descConnection = new SqlConnection(GetStrConnect.GetStrDsc()))
                                 {
                                     descConnection.Open();
-                                    CopyData(descConnection, item.DetailName, results, true, openWithDetail, item.DetailName, null, columnDetail[0]);
+                                    CopyData(descConnection, item.DetailName, results, bool.Parse(Overwrite), openWithDetail, item.DetailName, null, columnDetail[0]);
                                     this.Invoke(OnUpdateLog, "Import " + item.DetailName + ", Rows: " + results.Rows.Count);
                                 }
                             }
@@ -233,7 +214,7 @@ namespace TestFormDB.ImportFromDataTemp
                     {
                         bulkCopy.ColumnMappings.Add(item.Key, item.Value);
                     }
-
+                    var a = dt.Rows.Count;
                     bulkCopy.WriteToServer(dt);
                     bulkCopy.Close();
                 }
@@ -342,6 +323,117 @@ namespace TestFormDB.ImportFromDataTemp
             FormMain frm = new FormMain();
             Hide();
             frm.Show();
+        }
+
+        private void btnchitiet_Click(object sender, EventArgs e)
+        {
+            string textname ="";
+            int textcount = 0;
+            List<TableOld> TableOld = new List<TableOld>();
+            List<TableNew> TableNew = new List<TableNew>();
+            int CountSrc = 0, CountDsc = 0;
+            DataSet dsdetailSrc, dsSrc, dsDsc, dsdetailDsc;
+            using (SqlConnection conn = new SqlConnection(GetStrConnect.GetStrDsc()))
+            {
+                conn.Open();
+
+                foreach (var tableName in table)
+                {
+
+                    //Lấy danh sách Data
+                    SqlDataAdapter sqlDA;
+                    sqlDA = new SqlDataAdapter("Select zzzlvimport" + tableName.Table + ".* from zzzlvimport" + tableName.Table + " Where " + tableName.Condition, conn);
+
+
+                    dsSrc = new DataSet();
+                    sqlDA.Fill(dsSrc);
+                    TableOld.Add(new TableOld {
+                        tableNameOld = tableName.Table,
+                        RowsCountOld = (int)dsSrc.Tables[0].Rows.Count,
+                    });
+                    foreach (var item in detail)
+                    {
+                        if (item.ID == tableName.ID)
+                        {
+                            SqlDataAdapter sqlDAdetail;
+                            string query = "Select * From zzzlvimport" + item.DetailName;
+                            sqlDAdetail = new SqlDataAdapter(query, conn);
+
+                            dsdetailSrc = new DataSet();
+                            sqlDAdetail.Fill(dsdetailSrc);
+                            TableOld.Add(new TableOld
+                            {
+                                tableNameOld = item.DetailName,
+                                RowsCountOld = dsdetailSrc.Tables[0].Rows.Count,
+                            });
+
+                        }
+                    }
+                }
+
+                foreach (var tableName in table)
+                {
+
+                    //Lấy danh sách Data
+                    SqlDataAdapter sqlDA;
+                    sqlDA = new SqlDataAdapter("Select " + tableName.Table + ".* from " + tableName.Table + " Where " + tableName.Condition, conn);
+
+
+                    dsDsc = new DataSet();
+                    sqlDA.Fill(dsDsc);
+                    TableNew.Add(new TableNew
+                    {
+                        tableNameNew = tableName.Table,
+                        RowsCountNew = (int)dsDsc.Tables[0].Rows.Count,
+                    });
+                    foreach (var item in detail)
+                    {
+                        if (item.ID == tableName.ID)
+                        {
+                            SqlDataAdapter sqlDAdetail;
+                            string query = "Select * From " + item.DetailName;
+                            sqlDAdetail = new SqlDataAdapter(query, conn);
+
+                            dsdetailDsc = new DataSet();
+                            sqlDAdetail.Fill(dsdetailDsc);
+                            TableNew.Add(new TableNew
+                            {
+                                tableNameNew = item.DetailName,
+                                RowsCountNew = (int)dsdetailDsc.Tables[0].Rows.Count,
+                            });
+                        }
+                    }
+                }
+
+                foreach (var itemold in TableOld)
+                {
+                    foreach (var itemnew in TableNew)
+                    {
+                        if (itemold.tableNameOld==itemnew.tableNameNew)
+                        {
+                            textname += itemold.tableNameOld;
+                            textname += "\r\n";
+
+                            textcount += itemnew.RowsCountNew-itemold.RowsCountOld;
+                            //textcount += ;
+
+                        }
+                    }
+                }
+
+                MessageBox.Show("", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+
+        }
+        private class TableOld
+        {
+            public string tableNameOld { get; set; }
+            public int RowsCountOld { get; set; }
+        }
+        private class TableNew
+        {
+            public string tableNameNew { get; set; }
+            public int RowsCountNew { get; set; }
         }
     }
 }

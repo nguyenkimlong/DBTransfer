@@ -19,7 +19,7 @@ namespace TestFormDB.Update_Data
         public FrmSrcUpdate()
         {
             InitializeComponent();
-        }      
+        }
 
         private void btnRefresh_Click(object sender, EventArgs e)
         {
@@ -88,16 +88,12 @@ namespace TestFormDB.Update_Data
         {
             XmlDocument doc = new XmlDocument();
             doc.Load(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location) + "\\configSrc.xml");
-            var checkSave = doc.GetElementsByTagName("ChkSave").Item(0).InnerText;
-            if (bool.Parse(checkSave) == true)
-            {
-                this.txtserver.Text = doc.GetElementsByTagName("SrcServerName").Item(0).InnerText;
-                this.txtUsername.Text = doc.GetElementsByTagName("SrcUserName").Item(0).InnerText;
-                this.txtPassword.Text = doc.GetElementsByTagName("SrcPassword").Item(0).InnerText;
-                cbbDatabase.Items.Add(doc.GetElementsByTagName("SrcDatabase").Item(0).InnerText);
-                chkSavepass.Checked = bool.Parse(checkSave);
-                cbbDatabase.SelectedIndex = 0;
-            }
+            this.txtserver.Text = doc.GetElementsByTagName("SrcServerName").Item(0).InnerText;
+            this.txtUsername.Text = doc.GetElementsByTagName("SrcUserName").Item(0).InnerText;
+            this.txtPassword.Text = doc.GetElementsByTagName("SrcPassword").Item(0).InnerText;
+            cbbDatabase.Items.Add(doc.GetElementsByTagName("SrcDatabase").Item(0).InnerText);
+            cbbDatabase.SelectedIndex = 0;
+
         }
 
         private void rbtnuserWindow_CheckedChanged(object sender, EventArgs e)

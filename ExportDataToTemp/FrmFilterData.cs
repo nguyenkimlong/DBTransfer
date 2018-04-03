@@ -15,13 +15,15 @@ namespace TestFormDB.ExportDataToTemp
         private List<DataDetail> data = new List<DataDetail>();
 
         List<Detail> detail = new List<Detail>();
-        string server, username, pass, database;
+      
         public FrmFilterData()
         {
             InitializeComponent();
             dtpfromdate.CustomFormat = "dd/MM/yyyy";
             dtptodate.CustomFormat = "dd/MM/yyyy";
             GetDatabaseList();
+            cbbBatchNo.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+            cbbBatchNo.AutoCompleteSource = AutoCompleteSource.ListItems;
         }
 
         private void FrmFilterData_Load(object sender, EventArgs e)
@@ -85,14 +87,13 @@ namespace TestFormDB.ExportDataToTemp
             }
         }
 
-        public void CheckData()
+        public string CheckData()
         {
             try
             {
-                string conString = "Data Source=" + server + ";Database=" + database + ";User Id=" + username + ";Password=" + pass + "; pooling=false";
                 DataTable dtLockData = new DataTable();
                 DataTable dtdata = new DataTable();
-                using (SqlConnection conn = new SqlConnection(conString))
+                using (SqlConnection conn = new SqlConnection(GetStrConnect.GetStrSrc()))
                 {
                     conn.Open();
 
@@ -101,7 +102,7 @@ namespace TestFormDB.ExportDataToTemp
                         dtLockData.Load(cmd.ExecuteReader());
                     }
                     string Condition;
-                    if (data[0].Condition !=null)
+                    if (data[0].Condition != null)
                     {
                         Condition = data[0].Condition + " and ";
                     }
@@ -117,21 +118,27 @@ namespace TestFormDB.ExportDataToTemp
                             dtdata.Load(cmd1.ExecuteReader());
                             if (dtdata.Rows.Count <= 0)
                             {
-                                MessageBox.Show("Không có dữ liệu");
-                                return ;
+
+                                return "0";
                             }
                             else
                             {
+                                //check ngày khóa chứng từ
                                 foreach (DataRow row in dtLockData.Rows)
                                 {
-                                    if (row["FunctionID"].ToString() == data[0].ID)
+                                    foreach (var item in data)// duyệt danh sách chọn
                                     {
-                                        foreach (DataRow rowdata in dtdata.Rows)
+                                        if (row["FunctionID"].ToString() == item.ID) // kiểm tra có chức năng khóa
                                         {
-                                            
+                                            foreach (DataRow rowdata in dtdata.Rows)
+                                            {
+                                                if ((DateTime)row["ClosedToDate"] >= (DateTime)rowdata["DocumentDate"])
+                                                {
+                                                    return item.Name;
+                                                }
+                                            }
                                         }
-                                        break;
-                                    }                                 
+                                    }
                                 }
                             }
                         }
@@ -142,12 +149,28 @@ namespace TestFormDB.ExportDataToTemp
                             dtdata.Load(cmd1.ExecuteReader());
                             if (dtdata.Rows.Count <= 0)
                             {
-                                MessageBox.Show("Không có dữ liệu");
-                                return ;
+
+                                return "0";
                             }
                             else
                             {
-
+                                //check ngày khóa chứng từ
+                                foreach (DataRow row in dtLockData.Rows)
+                                {
+                                    foreach (var item in data)// duyệt danh sách chọn
+                                    {
+                                        if (row["FunctionID"].ToString() == item.ID) // kiểm tra có chức năng khóa
+                                        {
+                                            foreach (DataRow rowdata in dtdata.Rows)
+                                            {
+                                                if ((DateTime)row["ClosedToDate"] >= (DateTime)rowdata["DocumentDate"])
+                                                {
+                                                    return item.Name;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
                         else if (chkDocDate.Checked)
@@ -156,39 +179,83 @@ namespace TestFormDB.ExportDataToTemp
                             dtdata.Load(cmd1.ExecuteReader());
                             if (dtdata.Rows.Count <= 0)
                             {
-                                MessageBox.Show("Không có dữ liệu");
-                                return ;
+
+                                return "0";
                             }
                             else
                             {
-
+                                //check ngày khóa chứng từ
+                                foreach (DataRow row in dtLockData.Rows)
+                                {
+                                    foreach (var item in data)// duyệt danh sách chọn
+                                    {
+                                        if (row["FunctionID"].ToString() == item.ID) // kiểm tra có chức năng khóa
+                                        {
+                                            foreach (DataRow rowdata in dtdata.Rows)
+                                            {
+                                                if ((DateTime)row["ClosedToDate"] >= (DateTime)rowdata["DocumentDate"])
+                                                {
+                                                    return item.Name;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
                         else
                         {
-                            cmd1.CommandText = "select * from " + data[0].Table+ " Where " + Condition;
+                            cmd1.CommandText = "select * from " + data[0].Table + " Where " + Condition.Replace("and", "");
                             dtdata.Load(cmd1.ExecuteReader());
                             if (dtdata.Rows.Count <= 0)
                             {
-                                MessageBox.Show("Không có dữ liệu");
-                                return ;
+
+                                return "0";
                             }
                             else
                             {
-
+                                //check ngày khóa chứng từ
+                                foreach (DataRow row in dtLockData.Rows)
+                                {
+                                    foreach (var item in data)// duyệt danh sách chọn
+                                    {
+                                        if (row["FunctionID"].ToString() == item.ID) // kiểm tra có chức năng khóa
+                                        {
+                                            foreach (DataRow rowdata in dtdata.Rows)
+                                            {
+                                                if ((DateTime)row["ClosedToDate"] >= (DateTime)rowdata["DocumentDate"])
+                                                {
+                                                    return item.Name;
+                                                }
+                                            }                                          
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
-                }              
+                }
+                return "1";
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi: ",ex.Message);
+                MessageBox.Show("Lỗi: " + ex.Message);
+                return "0";
             }
         }
 
         private void btnNext_Click(object sender, EventArgs e)
         {
+            if (CheckData() == "0")
+            {
+                MessageBox.Show("Không có dữ liệu");
+                return;
+            }
+            if (CheckData().Length > 2)
+            {
+                MessageBox.Show("Chức năng " + CheckData() + " có chừng từ bị khóa ");
+                return;
+            }
 
 
 
@@ -259,20 +326,9 @@ namespace TestFormDB.ExportDataToTemp
         public void GetDatabaseList()
         {
             try
-            {
+            {             
 
-                XmlDocument doc = new XmlDocument();
-                doc.Load(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location) + "\\configSrc.xml");
-
-                server = doc.GetElementsByTagName("SrcServerName").Item(0).InnerText;
-                username = doc.GetElementsByTagName("SrcUserName").Item(0).InnerText;
-                pass = doc.GetElementsByTagName("SrcPassword").Item(0).InnerText;
-                database = doc.GetElementsByTagName("SrcDatabase").Item(0).InnerText;
-
-                // Open connection to the database
-                string conString = "Data Source=" + server + ";Database=" + database + ";User Id=" + username + ";Password=" + pass + "; pooling=false";
-
-                using (SqlConnection con = new SqlConnection(conString))
+                using (SqlConnection con = new SqlConnection(GetStrConnect.GetStrSrc()))
                 {
                     con.Open();
 

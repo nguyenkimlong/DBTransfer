@@ -19,7 +19,7 @@ namespace TestFormDB.ExportDataToTemp
 
         private void btnNext_Click(object sender, EventArgs e)
         {
-            FrmTransferDataExport frm = new FrmTransferDataExport();
+            FrmListTableSource frm = new FrmListTableSource();
             this.Hide();
             frm.Show();
         }

@@ -23,7 +23,7 @@ namespace TestFormDB.Update_Data
 
         private void btnBack_Click(object sender, EventArgs e)
         {
-            FrmSrcUpdate frm = new FrmSrcUpdate();
+            FormMain frm = new FormMain();
             this.Hide();
             frm.Show();
         }

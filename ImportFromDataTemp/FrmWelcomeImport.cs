@@ -31,7 +31,7 @@ namespace TestFormDB.ImportFromDataTemp
 
         private void btnNext_Click(object sender, EventArgs e)
         {
-            FrmSrcDatabase frm = new FrmSrcDatabase();
+            FrmListData frm = new FrmListData();
             this.Hide();
             frm.Show();
         }

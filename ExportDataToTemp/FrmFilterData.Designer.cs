@@ -108,7 +108,7 @@
             this.dtptodate.Name = "dtptodate";
             this.dtptodate.Size = new System.Drawing.Size(109, 21);
             this.dtptodate.TabIndex = 8;
-            this.dtptodate.Value = new System.DateTime(2018, 3, 15, 0, 0, 0, 0);
+            this.dtptodate.Value = new System.DateTime(2018, 4, 2, 0, 0, 0, 0);
             // 
             // dtpfromdate
             // 
@@ -119,11 +119,10 @@
             this.dtpfromdate.Name = "dtpfromdate";
             this.dtpfromdate.Size = new System.Drawing.Size(109, 21);
             this.dtpfromdate.TabIndex = 7;
-            this.dtpfromdate.Value = new System.DateTime(2018, 3, 15, 0, 0, 0, 0);
+            this.dtpfromdate.Value = new System.DateTime(2018, 4, 2, 0, 0, 0, 0);
             // 
             // cbbBatchNo
             // 
-            this.cbbBatchNo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbbBatchNo.Enabled = false;
             this.cbbBatchNo.FormattingEnabled = true;
             this.cbbBatchNo.Location = new System.Drawing.Point(270, 79);

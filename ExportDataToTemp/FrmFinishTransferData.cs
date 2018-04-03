@@ -72,26 +72,6 @@ namespace TestFormDB.ExportDataToTemp
                 XmlDocument docProcess = new XmlDocument();
                 docProcess.Load(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location) + "\\dataSrcExportCheck.xml");
 
-                // Đọc File XML data Nguồn
-                XmlDocument dataSrc = new XmlDocument();
-                dataSrc.Load(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location) + "\\configSrc.xml");
-                string SrcServerName = dataSrc.GetElementsByTagName("SrcServerName").Item(0).InnerText;
-                string SrcUserName = dataSrc.GetElementsByTagName("SrcUserName").Item(0).InnerText;
-                string SrcPassword = dataSrc.GetElementsByTagName("SrcPassword").Item(0).InnerText;
-                string SrcDatabase = dataSrc.GetElementsByTagName("SrcDatabase").Item(0).InnerText;
-
-                // Đọc File XML data Đích
-                XmlDocument dataDsc = new XmlDocument();
-                dataDsc.Load(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location) + "\\configDsc.xml");
-                string ServerName = dataDsc.GetElementsByTagName("ServerName").Item(0).InnerText;
-                string UserName = dataDsc.GetElementsByTagName("UserName").Item(0).InnerText;
-                string Password = dataDsc.GetElementsByTagName("Password").Item(0).InnerText;
-                string Database = dataDsc.GetElementsByTagName("Database").Item(0).InnerText;
-
-                string strSrc = "Data Source=" + SrcServerName + ";Database=" + SrcDatabase + ";User Id=" + SrcUserName + ";Password=" + SrcPassword + "; pooling=false";
-
-                string strDsc = "Data Source=" + ServerName + ";Database=" + Database + ";User Id=" + UserName + ";Password=" + Password + "; pooling=false";
-
                 //lấy Table từ table sau khi check chọn
                 var Table = docProcess.GetElementsByTagName("Function");
 
@@ -122,7 +102,7 @@ namespace TestFormDB.ExportDataToTemp
                 //var Overwrite = docProcess.GetElementsByTagName("Overwrite").Item(0).InnerText;
 
                 // kết nối data lấy dữ liệu bảng muốn chuyển
-                using (SqlConnection sourceConnection = new SqlConnection(strSrc))
+                using (SqlConnection sourceConnection = new SqlConnection(GetStrConnect.GetStrSrc()))
                 {
                     sourceConnection.Open();
 
@@ -131,23 +111,7 @@ namespace TestFormDB.ExportDataToTemp
 
                     //Import Master
                     foreach (var tableName in table)
-                    {
-                        string chuoi = null;
-                        //if (tableName.ListTable.Split(new char[] { ';' }).Length > 1)
-                        //{
-                        //    var tablelist = tableName.ListTable.Split(new char[] { ';' });
-
-                        //    var length = tablelist.Length;
-
-                        //    //ghép chuổi kết table
-                        //    for (var j = 0; j < length; j++)
-                        //    {
-                        //        chuoi += tablelist[j] + " " + tablelist[j] + " ,";
-                        //    }
-                        //}
-
-
-                        //chuoi = chuoi.Substring(0, chuoi.Length - 1);
+                    {                            
                         //Lấy danh sách Data
                         SqlDataAdapter sqlDA;
                         sqlDA = new SqlDataAdapter("Select " + tableName.Table + ".* from " + tableName.Table + " Where " + tableName.Condition, sourceConnection);
@@ -179,7 +143,7 @@ namespace TestFormDB.ExportDataToTemp
                             column.Add(item.ToString());
                         }
 
-                        using (SqlConnection descConnection = new SqlConnection(strDsc))
+                        using (SqlConnection descConnection = new SqlConnection(GetStrConnect.GetStrDsc()))
                         {
                             descConnection.Open();
                             CopyData(descConnection, tableName.Table, ds.Tables[0], true, openWith, tableName.Table, null, column[0]);
@@ -221,7 +185,7 @@ namespace TestFormDB.ExportDataToTemp
                                     columnDetail.Add(itemDetail.ToString());
                                 }
 
-                                using (SqlConnection descConnection = new SqlConnection(strDsc))
+                                using (SqlConnection descConnection = new SqlConnection(GetStrConnect.GetStrDsc()))
                                 {
                                     descConnection.Open();
                                     CopyData(descConnection, item.DetailName, results, true, openWithDetail, item.DetailName, null, columnDetail[0]);
@@ -282,33 +246,7 @@ namespace TestFormDB.ExportDataToTemp
 
                     bulkCopy.WriteToServer(dt);
                     bulkCopy.Close();
-                }
-
-                //var insertString = InsertString(cloumnMap)[0];
-                //var insertStringAlias = InsertString(cloumnMap)[1];
-
-                //var keyCol = ColumnKey;
-                //if (string.IsNullOrEmpty(keyCol)) keyCol = "DocumentID";
-
-                //if (overwrite)
-                //{
-                //    if (!string.IsNullOrEmpty(tableDetail))
-                //    {
-                //        cmd1.CommandText = "DELETE M FROM zzzlvimport" + tablename + " T INNER JOIN " + tableDetail + " M ON T." + keyCol + "= M." + keyCol + " \r\n";
-                //        cmd1.ExecuteNonQuery();
-                //    }
-
-                //    cmd1.CommandText = "DELETE M FROM zzzlvimport" + tablename + " T INNER JOIN " + tablename + " M ON T." + keyCol + "= M." + keyCol + " \r\n";
-                //    cmd1.ExecuteNonQuery();
-
-                //    cmd1.CommandText = "INSERT INTO " + tablename + "(" + insertString + ") SELECT " + insertStringAlias + " FROM zzzlvimport" + tablename + " T ";
-                //}
-                //else
-                //{
-                //    cmd1.CommandText = "INSERT INTO " + tablename + "(" + insertString + ") SELECT " + insertStringAlias + " FROM zzzlvimport" + tablename + " T LEFT JOIN " + tablename + " M ON T." + keyCol + "= M." + keyCol + " WHERE M." + keyCol + " IS NULL";
-                //}
-
-                //cmd1.ExecuteNonQuery();
+                }             
                 tran.Commit();
             }
             catch (Exception exp)

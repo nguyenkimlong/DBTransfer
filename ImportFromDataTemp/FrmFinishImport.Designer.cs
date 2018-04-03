@@ -36,12 +36,13 @@
             this.richTextBox1 = new System.Windows.Forms.RichTextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.panel3 = new System.Windows.Forms.Panel();
-            this.panel1 = new System.Windows.Forms.Panel();
-            this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.btnchitiet = new System.Windows.Forms.Button();
+            this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.panel3.SuspendLayout();
-            this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnFinish
@@ -123,9 +124,20 @@
             this.panel3.Size = new System.Drawing.Size(749, 104);
             this.panel3.TabIndex = 48;
             // 
+            // pictureBox1
+            // 
+            this.pictureBox1.Image = global::TestFormDB.Properties.Resources.sql;
+            this.pictureBox1.Location = new System.Drawing.Point(637, 21);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(87, 62);
+            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.pictureBox1.TabIndex = 7;
+            this.pictureBox1.TabStop = false;
+            // 
             // panel1
             // 
             this.panel1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.panel1.Controls.Add(this.btnchitiet);
             this.panel1.Controls.Add(this.btnFinish);
             this.panel1.Controls.Add(this.btnSavelog);
             this.panel1.Controls.Add(this.btnClose);
@@ -136,6 +148,18 @@
             this.panel1.Size = new System.Drawing.Size(749, 58);
             this.panel1.TabIndex = 47;
             // 
+            // btnchitiet
+            // 
+            this.btnchitiet.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.btnchitiet.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnchitiet.Location = new System.Drawing.Point(107, 17);
+            this.btnchitiet.Name = "btnchitiet";
+            this.btnchitiet.Size = new System.Drawing.Size(75, 23);
+            this.btnchitiet.TabIndex = 5;
+            this.btnchitiet.Text = "Detail ";
+            this.btnchitiet.UseVisualStyleBackColor = true;
+            this.btnchitiet.Click += new System.EventHandler(this.btnchitiet_Click);
+            // 
             // progressBar1
             // 
             this.progressBar1.Dock = System.Windows.Forms.DockStyle.Bottom;
@@ -145,16 +169,6 @@
             this.progressBar1.Size = new System.Drawing.Size(749, 10);
             this.progressBar1.TabIndex = 46;
             this.progressBar1.Visible = false;
-            // 
-            // pictureBox1
-            // 
-            this.pictureBox1.Image = global::TestFormDB.Properties.Resources.sql;
-            this.pictureBox1.Location = new System.Drawing.Point(637, 21);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(87, 62);
-            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.pictureBox1.TabIndex = 7;
-            this.pictureBox1.TabStop = false;
             // 
             // FrmFinishImport
             // 
@@ -175,8 +189,8 @@
             this.Load += new System.EventHandler(this.FrmFinishImport_Load);
             this.panel3.ResumeLayout(false);
             this.panel3.PerformLayout();
-            this.panel1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            this.panel1.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -193,5 +207,6 @@
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.ProgressBar progressBar1;
         private System.Windows.Forms.PictureBox pictureBox1;
+        private System.Windows.Forms.Button btnchitiet;
     }
 }

@@ -26,7 +26,7 @@ namespace TestFormDB.TransferMasterData
 
         private void btnNext_Click(object sender, EventArgs e)
         {
-            Form1 frm = new Form1();
+            ListTable frm = new ListTable();
             this.Hide();
             frm.Show();
         }
