@@ -12,18 +12,17 @@ namespace TestFormDB.ExportDataToTemp
 
     public partial class FrmFilterData : Form
     {
-        private List<DataDetail> data = new List<DataDetail>();
+        private readonly List<DataDetail> data = new List<DataDetail>();
 
-        List<Detail> detail = new List<Detail>();
-      
+        private readonly List<Detail> detail = new List<Detail>();
+
         public FrmFilterData()
         {
             InitializeComponent();
-            dtpfromdate.CustomFormat = "dd/MM/yyyy";
-            dtptodate.CustomFormat = "dd/MM/yyyy";
+            dtpfromdate.CustomFormat = @"dd/MM/yyyy";
+            dtptodate.CustomFormat = @"dd/MM/yyyy";
             GetDatabaseList();
-            cbbBatchNo.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
-            cbbBatchNo.AutoCompleteSource = AutoCompleteSource.ListItems;
+
         }
 
         private void FrmFilterData_Load(object sender, EventArgs e)
@@ -39,19 +38,20 @@ namespace TestFormDB.ExportDataToTemp
                 {
                     data.Add(new DataDetail
                     {
-                        ID = item.SelectNodes("ID").Item(0).InnerText,
-                        Name = item.SelectNodes("Name").Item(0).InnerText,
-                        Table = item.SelectNodes("Table").Item(0).InnerText,
-                        Condition = item.SelectNodes("Condition").Item(0).InnerText,
-                        Language = item.SelectNodes("Language").Item(0).InnerText
+                        ID = item.SelectNodes("ID")?.Item(0)?.InnerText,
+                        Name = item.SelectNodes("Name")?.Item(0)?.InnerText,
+                        Table = item.SelectNodes("Table")?.Item(0)?.InnerText,
+                        Condition = item.SelectNodes("Condition")?.Item(0)?.InnerText,
+                        Language = item.SelectNodes("Language")?.Item(0)?.InnerText
                     });
+                    // ReSharper disable once PossibleNullReferenceException
                     foreach (XmlNode itemdetail in item.SelectNodes("Detail"))
                     {
                         detail.Add(new Detail
                         {
-                            ID = item.SelectNodes("ID").Item(0).InnerText,
+                            ID = item.SelectNodes("ID")?.Item(0)?.InnerText,
                             DetailName = itemdetail.InnerXml,
-                            ConditionDetail = itemdetail.Attributes[0].Value
+                            ConditionDetail = itemdetail.Attributes?[0].Value
                         });
                     }
                 }
@@ -114,7 +114,7 @@ namespace TestFormDB.ExportDataToTemp
                         cmd1.CommandType = CommandType.Text;
                         if (chkDocDate.Checked && chkBatchNo.Checked)
                         {
-                            cmd1.CommandText = "select * from " + data[0].Table + " Where " + Condition + "  DocumentDate between '" + dtpfromdate.Value.ToShortDateString() + "' and '" + dtptodate.Value.ToShortDateString() + "' and BatchNo ='" + cbbBatchNo.SelectedValue.ToString().Trim() + "'";
+                            cmd1.CommandText = "select * from " + data[0].Table + " Where " + Condition + "  DocumentDate between '" + dtpfromdate.Value.ToShortDateString() + "' and '" + dtptodate.Value.ToShortDateString() + "' and BatchNo like '" + cbbBatchNo.Text.ToString().Replace("*","%") + "'";
                             dtdata.Load(cmd1.ExecuteReader());
                             if (dtdata.Rows.Count <= 0)
                             {
@@ -145,7 +145,7 @@ namespace TestFormDB.ExportDataToTemp
 
                         else if (chkBatchNo.Checked)
                         {
-                            cmd1.CommandText = "select * from " + data[0].Table + " Where " + Condition + "  BatchNo ='" + cbbBatchNo.SelectedValue.ToString().Trim() + "'";
+                            cmd1.CommandText = "select * from " + data[0].Table + " Where " + Condition + "  BatchNo like '" + cbbBatchNo.Text.ToString().Replace("*", "%") + "'";
                             dtdata.Load(cmd1.ExecuteReader());
                             if (dtdata.Rows.Count <= 0)
                             {
@@ -227,7 +227,7 @@ namespace TestFormDB.ExportDataToTemp
                                                 {
                                                     return item.Name;
                                                 }
-                                            }                                          
+                                            }
                                         }
                                     }
                                 }
@@ -239,7 +239,7 @@ namespace TestFormDB.ExportDataToTemp
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi: " + ex.Message);
+                MessageBox.Show(@"Lỗi: " + ex.Message);
                 return "0";
             }
         }
@@ -248,19 +248,18 @@ namespace TestFormDB.ExportDataToTemp
         {
             if (CheckData() == "0")
             {
-                MessageBox.Show("Không có dữ liệu");
+                MessageBox.Show(@"Không có dữ liệu");
                 return;
             }
             if (CheckData().Length > 2)
             {
-                MessageBox.Show("Chức năng " + CheckData() + " có chừng từ bị khóa ");
+                MessageBox.Show(@"Chức năng " + CheckData() + @" có chừng từ bị khóa ");
                 return;
             }
 
 
 
-            XmlWriterSettings settings = new XmlWriterSettings();
-            settings.Indent = true;
+            XmlWriterSettings settings = new XmlWriterSettings {Indent = true};
 
             XmlWriter writer = XmlWriter.Create(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location) + "\\dataSrcExportCheck.xml", settings);
 
@@ -277,13 +276,13 @@ namespace TestFormDB.ExportDataToTemp
                 writer.WriteElementString("Language", item.Language);
                 if (chkDocDate.Checked && chkBatchNo.Checked)
                 {
-                    writer.WriteElementString("Condition", item.Condition + " And DocumentDate between '" + dtpfromdate.Value.ToShortDateString() + "' and '" + dtptodate.Value.ToShortDateString() + "' and BatchNo ='" + cbbBatchNo.SelectedValue.ToString().Trim() + "'");
+                    writer.WriteElementString("Condition", item.Condition + " And DocumentDate between '" + dtpfromdate.Value.ToShortDateString() + "' and '" + dtptodate.Value.ToShortDateString() + "' and BatchNo like '" + cbbBatchNo.Text.ToString().Replace("*", "%") + "'");
                 }
                 else
                 {
                     if (chkBatchNo.Checked)
                     {
-                        writer.WriteElementString("Condition", item.Condition + " and BatchNo ='" + cbbBatchNo.SelectedValue.ToString().Trim() + "'");
+                        writer.WriteElementString("Condition", item.Condition + " and BatchNo like '" + cbbBatchNo.Text.ToString().Replace("*", "%") + "'");
                     }
                     else if (chkDocDate.Checked)
                     {
@@ -326,7 +325,7 @@ namespace TestFormDB.ExportDataToTemp
         public void GetDatabaseList()
         {
             try
-            {             
+            {
 
                 using (SqlConnection con = new SqlConnection(GetStrConnect.GetStrSrc()))
                 {
@@ -336,35 +335,19 @@ namespace TestFormDB.ExportDataToTemp
                     // this with the current connection.
                     using (SqlCommand cmd = new SqlCommand("SELECT BatchNo,BatchDesc from GL_tblBatchList", con))
                     {
-                        DataTable dt = new DataTable();
                         var adapter = new SqlDataAdapter(cmd);
                         var ds = new DataSet();
                         adapter.Fill(ds);
-                        dt = ds.Tables[0];
-                        dt.Columns.Add("CustomBatch", typeof(string));
-                        foreach (DataRow row in dt.Rows)
-                        {
-                            if (row["BatchNo"].ToString().Length <= 20)
-                            {
-                                var i = 20 - row["BatchNo"].ToString().Length;
-                                row["BatchNo"] = row["BatchNo"].ToString() + string.Concat(Enumerable.Repeat("  ", i));
-                                row["CustomBatch"] = row["BatchNo"].ToString() + " " + row["BatchDesc"].ToString();
-                            }
-                            else
-                            {
-                                row["CustomBatch"] = row["BatchNo"].ToString() + " " + row["BatchDesc"].ToString();
-                            }
-                        }
 
-                        cbbBatchNo.DataSource = ds.Tables[0];
-                        cbbBatchNo.DisplayMember = "CustomBatch";
-                        cbbBatchNo.ValueMember = "BatchNo";
+                        cbbBatchNo.Properties.DataSource = ds.Tables[0];
+                        cbbBatchNo.Properties.DisplayMember = "BatchNo";
+                        cbbBatchNo.Properties.ValueMember = "BatchNo";
                     }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Connect Fail");
+                MessageBox.Show(@"Connect Fail");
 
             }
         }
@@ -384,7 +367,7 @@ namespace TestFormDB.ExportDataToTemp
         private void FrmFilterData_FormClosing(object sender, FormClosingEventArgs e)
         {
             DialogResult tl;
-            tl = MessageBox.Show("Bạn có muốn hủy thao tác và quay lại màn hình chính", "Thông báo", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            tl = MessageBox.Show(@"Bạn có muốn hủy thao tác và quay lại màn hình chính", @"Thông báo", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (tl == DialogResult.Yes)
             {
                 FormMain frm = new FormMain();
@@ -396,10 +379,11 @@ namespace TestFormDB.ExportDataToTemp
                 e.Cancel = true;
             }
         }
+      
 
-        private void cbbBatchNo_SelectedIndexChanged(object sender, EventArgs e)
+        private void cbbBatchNo_EditValueChanged(object sender, EventArgs e)
         {
-
+            cbbBatchNo.Text = cbbBatchNo.Text.ToString();
         }
     }
 }

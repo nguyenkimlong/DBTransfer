@@ -35,7 +35,6 @@
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.dtptodate = new System.Windows.Forms.DateTimePicker();
             this.dtpfromdate = new System.Windows.Forms.DateTimePicker();
-            this.cbbBatchNo = new System.Windows.Forms.ComboBox();
             this.chkBatchNo = new System.Windows.Forms.CheckBox();
             this.label3 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
@@ -45,10 +44,12 @@
             this.btncancel = new System.Windows.Forms.Button();
             this.btnNext = new System.Windows.Forms.Button();
             this.btnBack = new System.Windows.Forms.Button();
+            this.cbbBatchNo = new DevExpress.XtraEditors.LookUpEdit();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.panel2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.cbbBatchNo.Properties)).BeginInit();
             this.SuspendLayout();
             // 
             // panel1
@@ -84,9 +85,9 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.cbbBatchNo);
             this.groupBox1.Controls.Add(this.dtptodate);
             this.groupBox1.Controls.Add(this.dtpfromdate);
-            this.groupBox1.Controls.Add(this.cbbBatchNo);
             this.groupBox1.Controls.Add(this.chkBatchNo);
             this.groupBox1.Controls.Add(this.label3);
             this.groupBox1.Controls.Add(this.label1);
@@ -120,15 +121,6 @@
             this.dtpfromdate.Size = new System.Drawing.Size(136, 21);
             this.dtpfromdate.TabIndex = 7;
             this.dtpfromdate.Value = new System.DateTime(2018, 4, 2, 0, 0, 0, 0);
-            // 
-            // cbbBatchNo
-            // 
-            this.cbbBatchNo.Enabled = false;
-            this.cbbBatchNo.FormattingEnabled = true;
-            this.cbbBatchNo.Location = new System.Drawing.Point(270, 79);
-            this.cbbBatchNo.Name = "cbbBatchNo";
-            this.cbbBatchNo.Size = new System.Drawing.Size(349, 23);
-            this.cbbBatchNo.TabIndex = 6;
             // 
             // chkBatchNo
             // 
@@ -230,6 +222,21 @@
             this.btnBack.UseVisualStyleBackColor = true;
             this.btnBack.Click += new System.EventHandler(this.btnBack_Click);
             // 
+            // cbbBatchNo
+            // 
+            this.cbbBatchNo.EditValue = "";
+            this.cbbBatchNo.Enabled = false;
+            this.cbbBatchNo.Location = new System.Drawing.Point(270, 80);
+            this.cbbBatchNo.Name = "cbbBatchNo";
+            this.cbbBatchNo.Properties.AcceptEditorTextAsNewValue = DevExpress.Utils.DefaultBoolean.True;
+            this.cbbBatchNo.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.cbbBatchNo.Properties.NullText = "";
+            this.cbbBatchNo.Properties.TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.Standard;
+            this.cbbBatchNo.Size = new System.Drawing.Size(349, 20);
+            this.cbbBatchNo.TabIndex = 9;
+            this.cbbBatchNo.EditValueChanged += new System.EventHandler(this.cbbBatchNo_EditValueChanged);
+            // 
             // FilterImportData
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -252,6 +259,7 @@
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.cbbBatchNo.Properties)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -263,7 +271,6 @@
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.DateTimePicker dtptodate;
         private System.Windows.Forms.DateTimePicker dtpfromdate;
-        private System.Windows.Forms.ComboBox cbbBatchNo;
         private System.Windows.Forms.CheckBox chkBatchNo;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label1;
@@ -274,5 +281,6 @@
         private System.Windows.Forms.Button btnNext;
         private System.Windows.Forms.Button btnBack;
         private System.Windows.Forms.PictureBox pictureBox1;
+        private DevExpress.XtraEditors.LookUpEdit cbbBatchNo;
     }
 }

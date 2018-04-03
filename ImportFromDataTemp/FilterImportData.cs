@@ -24,10 +24,6 @@ namespace TestFormDB.ImportFromDataTemp
             dtpfromdate.CustomFormat = "dd/MM/yyyy";
             dtptodate.CustomFormat = "dd/MM/yyyy";
             GetDatabaseList();
-            cbbBatchNo.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
-            cbbBatchNo.AutoCompleteSource = AutoCompleteSource.ListItems;
-           
-          
         }
 
         private void btnBack_Click(object sender, EventArgs e)
@@ -57,13 +53,13 @@ namespace TestFormDB.ImportFromDataTemp
                 writer.WriteElementString("Language", item.Language);
                 if (chkDocDate.Checked && chkBatchNo.Checked)
                 {
-                    writer.WriteElementString("Condition", item.Condition + " And DocumentDate between '" + dtpfromdate.Value.ToShortDateString() + "' and '" + dtptodate.Value.ToShortDateString() + "' and BatchNo ='" + cbbBatchNo.SelectedValue.ToString() + "'");
+                    writer.WriteElementString("Condition", item.Condition + " And DocumentDate between '" + dtpfromdate.Value.ToShortDateString() + "' and '" + dtptodate.Value.ToShortDateString() + "' and BatchNo ='" + cbbBatchNo.Text.ToString() + "'");
                 }
                 else
                 {
                     if (chkBatchNo.Checked)
                     {
-                        writer.WriteElementString("Condition", item.Condition + " and BatchNo ='" + cbbBatchNo.SelectedValue.ToString() + "'");
+                        writer.WriteElementString("Condition", item.Condition + " and BatchNo ='" + cbbBatchNo.Text.ToString() + "'");
                     }
                     else if (chkDocDate.Checked)
                     {
@@ -107,7 +103,7 @@ namespace TestFormDB.ImportFromDataTemp
         }
 
         private void FilterImportData_Load(object sender, EventArgs e)
-        {           
+        {
             try
             {
                 XmlDocument docProcess = new XmlDocument();
@@ -144,7 +140,7 @@ namespace TestFormDB.ImportFromDataTemp
         public void GetDatabaseList()
         {
             try
-            {              
+            {
 
                 using (SqlConnection con = new SqlConnection(GetStrConnect.GetStrSrc()))
                 {
@@ -154,29 +150,14 @@ namespace TestFormDB.ImportFromDataTemp
                     // this with the current connection.
                     using (SqlCommand cmd = new SqlCommand("SELECT BatchNo,BatchDesc from GL_tblBatchList", con))
                     {
-                        DataTable dt = new DataTable();
                         var adapter = new SqlDataAdapter(cmd);
                         var ds = new DataSet();
                         adapter.Fill(ds);
-                        dt = ds.Tables[0];
-                        dt.Columns.Add("CustomBatch", typeof(string));
-                        foreach (DataRow row in dt.Rows)
-                        {
-                            if (row["BatchNo"].ToString().Length <= 20)
-                            {
-                                var i = 20 - row["BatchNo"].ToString().Length;
-                                row["BatchNo"] = row["BatchNo"].ToString() + string.Concat(Enumerable.Repeat("  ", i));
-                                row["CustomBatch"] = row["BatchNo"].ToString() + " " + row["BatchDesc"].ToString();
-                            }
-                            else
-                            {
-                                row["CustomBatch"] = row["BatchNo"].ToString() + " " + row["BatchDesc"].ToString();
-                            }
-                        }
-                        cbbBatchNo.DataSource = ds.Tables[0];
-                     
-                        cbbBatchNo.DisplayMember = "CustomBatch";
-                        cbbBatchNo.ValueMember = "BatchNo";
+
+                        cbbBatchNo.Properties.DataSource = ds.Tables[0];
+
+                        cbbBatchNo.Properties.DisplayMember = "BatchNo";
+                        cbbBatchNo.Properties.ValueMember = "BatchNo";
                     }
                 }
 
@@ -218,6 +199,9 @@ namespace TestFormDB.ImportFromDataTemp
             }
         }
 
-       
+        private void cbbBatchNo_EditValueChanged(object sender, EventArgs e)
+        {
+            cbbBatchNo.Text = cbbBatchNo.Text.ToString();
+        }
     }
 }

@@ -66,19 +66,19 @@ namespace TestFormDB.Update_Data
             {
                 data.Add(new DataDetail
                 {
-                    ID = item.SelectNodes("ID").Item(0).InnerText,
-                    Name = item.SelectNodes("Name").Item(0).InnerText,
-                    Table = item.SelectNodes("Table").Item(0).InnerText,
-                    Condition = item.SelectNodes("Condition").Item(0).InnerText,
-                    Language = item.SelectNodes("Language").Item(0).InnerText
+                    ID = item.SelectNodes("ID")?.Item(0)?.InnerText,
+                    Name = item.SelectNodes("Name")?.Item(0)?.InnerText,
+                    Table = item.SelectNodes("Table")?.Item(0)?.InnerText,
+                    Condition = item.SelectNodes("Condition")?.Item(0)?.InnerText,
+                    Language = item.SelectNodes("Language")?.Item(0)?.InnerText
                 });
                 foreach (XmlNode itemdetail in item.SelectNodes("Detail"))
                 {
                     detail.Add(new Detail
                     {
-                        ID = item.SelectNodes("ID").Item(0).InnerText,
+                        ID = item.SelectNodes("ID")?.Item(0)?.InnerText,
                         DetailName = itemdetail.InnerXml,
-                        ConditionDetail = itemdetail.Attributes[0].Value
+                        ConditionDetail = itemdetail.Attributes?[0].Value
                     });
                 }
                 break;
@@ -158,18 +158,18 @@ namespace TestFormDB.Update_Data
             XmlDocument doc = new XmlDocument();
             doc.Load(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location) + "\\configDsc.xml");
 
-            ServerName = doc.GetElementsByTagName("ServerName").Item(0).InnerText;
-            UserName = doc.GetElementsByTagName("UserName").Item(0).InnerText;
-            Password = doc.GetElementsByTagName("Password").Item(0).InnerText;
-            Database = doc.GetElementsByTagName("Database").Item(0).InnerText;
+            ServerName = doc.GetElementsByTagName("ServerName").Item(0)?.InnerText;
+            UserName = doc.GetElementsByTagName("UserName").Item(0)?.InnerText;
+            Password = doc.GetElementsByTagName("Password").Item(0)?.InnerText;
+            Database = doc.GetElementsByTagName("Database").Item(0)?.InnerText;
 
             XmlDocument docSrc = new XmlDocument();
             docSrc.Load(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location) + "\\configSrc.xml");
 
-            SrcServerName = docSrc.GetElementsByTagName("SrcServerName").Item(0).InnerText;
-            SrcUserName = docSrc.GetElementsByTagName("SrcUserName").Item(0).InnerText;
-            SrcPassword = docSrc.GetElementsByTagName("SrcPassword").Item(0).InnerText;
-            SrcDatabase = docSrc.GetElementsByTagName("SrcDatabase").Item(0).InnerText;
+            SrcServerName = docSrc.GetElementsByTagName("SrcServerName").Item(0)?.InnerText;
+            SrcUserName = docSrc.GetElementsByTagName("SrcUserName").Item(0)?.InnerText;
+            SrcPassword = docSrc.GetElementsByTagName("SrcPassword").Item(0)?.InnerText;
+            SrcDatabase = docSrc.GetElementsByTagName("SrcDatabase").Item(0)?.InnerText;
 
 
         }
@@ -272,7 +272,7 @@ namespace TestFormDB.Update_Data
         private void FrmEditDataImport_FormClosing(object sender, FormClosingEventArgs e)
         {
             DialogResult tl;
-            tl = MessageBox.Show("Bạn có muốn hủy thao tác và quay lại màn hình chính", "Thông báo", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            tl = MessageBox.Show(@"Bạn có muốn hủy thao tác và quay lại màn hình chính", @"Thông báo", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (tl == DialogResult.Yes)
             {
                 FormMain frm = new FormMain();
@@ -408,13 +408,13 @@ namespace TestFormDB.Update_Data
                             }
                         }
                     }
-                    MessageBox.Show("Cập nhật thành công");
+                    MessageBox.Show(@"Cập nhật thành công");
                 }
                 else if (data[0].Name == "Hóa đơn bán hàng")
                 {
                     List<TableNew> table = GetDataCapNhatGia();
                     DialogResult tl;
-                    tl = MessageBox.Show("Bạn có muốn thay đổi đơn giá sau thuế?", "Thông báo", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                    tl = MessageBox.Show(@"Bạn có muốn thay đổi đơn giá sau thuế?", @"Thông báo", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                     if (tl == DialogResult.Yes)
                     {
                         foreach (DataRow row in dataTable[0].Rows)
@@ -582,7 +582,7 @@ namespace TestFormDB.Update_Data
                                 }
                             }
                         }
-                        MessageBox.Show("Cập nhật thành công");
+                        MessageBox.Show(@"Cập nhật thành công");
 
                     }
                     else
@@ -739,19 +739,19 @@ namespace TestFormDB.Update_Data
                                 }
                             }
                         }
-                        MessageBox.Show("Cập nhật thành công");
+                        MessageBox.Show(@"Cập nhật thành công");
 
                     }
                 }
                 else
                 {
-                    MessageBox.Show("Chức năng này chỉ được dùng cho hóa đơn mua hoặc bán");
+                    MessageBox.Show(@"Chức năng này chỉ được dùng cho hóa đơn mua hoặc bán");
                     return;
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi: ", ex.Message);
+                MessageBox.Show(@"Lỗi: "+ ex.Message);
             }
 
         }
@@ -804,7 +804,7 @@ namespace TestFormDB.Update_Data
                             string query = "";
                             query = "Select T2.DocumentDate,T1.* ";
                             query += "From " + "zzzlvimport" + item.DetailName + " T1, " + "zzzlvimport" + data[0].Table + " T2 ";
-                            query += " Where " + " T1." + item.ConditionDetail + " = " + " T2." + item.ConditionDetail + " and " + data[0].Condition + " and " + "BatchNo='" + txtLoChungTu.Text+"'";
+                            query += " Where " + " T1." + item.ConditionDetail + " = " + " T2." + item.ConditionDetail + " and " + data[0].Condition + " and " + "BatchNo like '" + txtLoChungTu.Text.ToString().Replace("*","%") +"'";
                             query += " Order by T2.DocumentDate ";
                             sqlDA = new SqlDataAdapter(query, sourceConnection);
 
@@ -821,7 +821,7 @@ namespace TestFormDB.Update_Data
                             string query = "";
                             query = "Select T2.DocumentDate,T1.* ";
                             query += "From " + "zzzlvimport" + item.DetailName + " T1, " + "zzzlvimport" + data[0].Table + " T2 ";
-                            query += " Where " + " T1." + item.ConditionDetail + " = " + " T2." + item.ConditionDetail + " and " + data[0].Condition + " and " + "BatchNo='" + txtLoChungTu.Text + "' and " + " DocumentDate Between '" + dtpFromDate.Value.ToShortDateString() + "' and '" + dtpToDate.Value.ToShortDateString() + "'";
+                            query += " Where " + " T1." + item.ConditionDetail + " = " + " T2." + item.ConditionDetail + " and " + data[0].Condition + " and " + "BatchNo like '" + txtLoChungTu.Text.ToString().Replace("*", "%") + "' and " + " DocumentDate Between '" + dtpFromDate.Value.ToShortDateString() + "' and '" + dtpToDate.Value.ToShortDateString() + "'";
                             query += " Order by T2.DocumentDate ";
                             sqlDA = new SqlDataAdapter(query, sourceConnection);
 
@@ -853,7 +853,7 @@ namespace TestFormDB.Update_Data
 
                     if (dataTable[0].Rows.Count <= 0)
                     {
-                        MessageBox.Show("Không có dữ liệu");
+                        MessageBox.Show(@"Không có dữ liệu");
                         return;
                     }
 
@@ -916,7 +916,7 @@ namespace TestFormDB.Update_Data
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi: "+ ex.Message);
+                MessageBox.Show(@"Lỗi: "+ ex.Message);
             }
         }
 
@@ -978,7 +978,7 @@ namespace TestFormDB.Update_Data
             try
             {
                var a= dt.Rows.Count;
-                if(detail.Where(o=>o.DetailName == tablename).Any())
+                if(detail.Any(o => o.DetailName == tablename))
                 {
                     if (ColumnNotMap == null) ColumnNotMap = new List<string>();
                     ColumnNotMap.Add("DocumentDate");
@@ -1022,14 +1022,14 @@ namespace TestFormDB.Update_Data
                         CopyTable(sourceConnection, data, data.TableName);
                     }
                 }
-                MessageBox.Show("Cập nhật thành công");
+                MessageBox.Show(@"Cập nhật thành công");
                 FormMain frm = new FormMain();
                 Hide();
                 frm.Show();
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi: "+ ex.Message);
+                MessageBox.Show(@"Lỗi: "+ ex.Message);
             }
 
 
