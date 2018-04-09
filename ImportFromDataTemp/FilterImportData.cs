@@ -33,8 +33,178 @@ namespace TestFormDB.ImportFromDataTemp
             frmList.Show();
         }
 
+        public string CheckData()
+        {
+            try
+            {
+                DataTable dtLockData = new DataTable();
+                DataTable dtdata = new DataTable();
+                using (SqlConnection conn = new SqlConnection(GetStrConnect.GetStrSrc()))
+                {
+                    conn.Open();
+
+                    using (SqlCommand cmd = new SqlCommand("select * from AD_tblLockDataParameter", conn))
+                    {
+                        dtLockData.Load(cmd.ExecuteReader());
+                    }
+                    string Condition;
+                    if (data[0].Condition != null)
+                    {
+                        Condition = data[0].Condition + " and  ";
+                    }
+                    else
+                        Condition = "";
+                    using (SqlCommand cmd1 = new SqlCommand())
+                    {
+                        cmd1.Connection = conn;
+                        cmd1.CommandType = CommandType.Text;
+                        if (chkDocDate.Checked && chkBatchNo.Checked)
+                        {
+                            cmd1.CommandText = "select * from " + data[0].Table + " Where " + Condition + "  DocumentDate between '" + dtpfromdate.Value.ToShortDateString() + "' and '" + dtptodate.Value.ToShortDateString() + "' and BatchNo like '" + cbbBatchNo.Text.ToString().Replace("*", "%") + "'";
+                            dtdata.Load(cmd1.ExecuteReader());
+                            if (dtdata.Rows.Count <= 0)
+                            {
+
+                                return "0";
+                            }
+                            else
+                            {
+                                //check ngày khóa chứng từ
+                                foreach (DataRow row in dtLockData.Rows)
+                                {
+                                    foreach (var item in data)// duyệt danh sách chọn
+                                    {
+                                        if (row["FunctionID"].ToString() == item.ID) // kiểm tra có chức năng khóa
+                                        {
+                                            foreach (DataRow rowdata in dtdata.Rows)
+                                            {
+                                                if ((DateTime)row["ClosedToDate"] >= (DateTime)rowdata["DocumentDate"])
+                                                {
+                                                    return item.Name;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        else if (chkBatchNo.Checked)
+                        {
+                            cmd1.CommandText = "select * from " + data[0].Table + " Where " + Condition + "  BatchNo like '" + cbbBatchNo.Text.ToString().Replace("*", "%") + "'";
+                            dtdata.Load(cmd1.ExecuteReader());
+                            if (dtdata.Rows.Count <= 0)
+                            {
+
+                                return "0";
+                            }
+                            else
+                            {
+                                //check ngày khóa chứng từ
+                                foreach (DataRow row in dtLockData.Rows)
+                                {
+                                    foreach (var item in data)// duyệt danh sách chọn
+                                    {
+                                        if (row["FunctionID"].ToString() == item.ID) // kiểm tra có chức năng khóa
+                                        {
+                                            foreach (DataRow rowdata in dtdata.Rows)
+                                            {
+                                                if ((DateTime)row["ClosedToDate"] >= (DateTime)rowdata["DocumentDate"])
+                                                {
+                                                    return item.Name;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        else if (chkDocDate.Checked)
+                        {
+                            cmd1.CommandText = "select * from " + data[0].Table + " Where " + Condition + "  DocumentDate between '" + dtpfromdate.Value.ToShortDateString() + "' and '" + dtptodate.Value.ToShortDateString() + "'";
+                            dtdata.Load(cmd1.ExecuteReader());
+                            if (dtdata.Rows.Count <= 0)
+                            {
+
+                                return "0";
+                            }
+                            else
+                            {
+                                //check ngày khóa chứng từ
+                                foreach (DataRow row in dtLockData.Rows)
+                                {
+                                    foreach (var item in data)// duyệt danh sách chọn
+                                    {
+                                        if (row["FunctionID"].ToString() == item.ID) // kiểm tra có chức năng khóa
+                                        {
+                                            foreach (DataRow rowdata in dtdata.Rows)
+                                            {
+                                                if ((DateTime)row["ClosedToDate"] >= (DateTime)rowdata["DocumentDate"])
+                                                {
+                                                    return item.Name;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            cmd1.CommandText = "select * from " + data[0].Table + " Where " + Condition.Replace("and  ", "");
+                            dtdata.Load(cmd1.ExecuteReader());
+                            if (dtdata.Rows.Count <= 0)
+                            {
+
+                                return "0";
+                            }
+                            else
+                            {
+                                //check ngày khóa chứng từ
+                                foreach (DataRow row in dtLockData.Rows)
+                                {
+                                    foreach (var item in data)// duyệt danh sách chọn
+                                    {
+                                        if (row["FunctionID"].ToString() == item.ID) // kiểm tra có chức năng khóa
+                                        {
+                                            foreach (DataRow rowdata in dtdata.Rows)
+                                            {
+                                                if ((DateTime)row["ClosedToDate"] >= (DateTime)rowdata["DocumentDate"])
+                                                {
+                                                    return item.Name;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                return "1";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(@"Lỗi: " + ex.Message);
+                return "0";
+            }
+        }
+
         private void btnNext_Click(object sender, EventArgs e)
         {
+            if (CheckData() == "0")
+            {
+                MessageBox.Show(@"Không có dữ liệu");
+                return;
+            }
+            if (CheckData().Length > 2)
+            {
+                MessageBox.Show(@"Chức năng " + CheckData() + @" có chừng từ bị khóa ");
+                return;
+            }
+
+
+
             XmlWriterSettings settings = new XmlWriterSettings();
             settings.Indent = true;
 
@@ -107,7 +277,7 @@ namespace TestFormDB.ImportFromDataTemp
             try
             {
                 XmlDocument docProcess = new XmlDocument();
-                docProcess.Load(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location) + "\\dataImportCheck.xml");
+                docProcess.Load(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location) + "\\dataSrcExportCheck.xml");
 
                 var after = docProcess.GetElementsByTagName("Root");
                 var Table = docProcess.GetElementsByTagName("Function");
@@ -172,17 +342,23 @@ namespace TestFormDB.ImportFromDataTemp
 
         private void FilterImportData_FormClosing(object sender, FormClosingEventArgs e)
         {
-
+            DialogResult tl;
+            tl = MessageBox.Show(@"Bạn có muốn hủy thao tác và quay lại màn hình chính", @"Thông báo", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (tl == DialogResult.Yes)
+            {
+                FormMain frm = new FormMain();
+                Hide();
+                frm.Show();
+            }
+            else
+            {
+                e.Cancel = true;
+            }
         }
 
         private void chkBatchNo_CheckedChanged(object sender, EventArgs e)
         {
-            if (chkBatchNo.Checked)
-            {
-                cbbBatchNo.Enabled = true;
-            }
-            else
-                cbbBatchNo.Enabled = false;
+            cbbBatchNo.Enabled = chkBatchNo.Checked;
         }
 
         private void chkDocDate_CheckedChanged(object sender, EventArgs e)

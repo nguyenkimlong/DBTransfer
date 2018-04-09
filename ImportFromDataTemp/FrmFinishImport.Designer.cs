@@ -184,7 +184,7 @@
             this.MinimizeBox = false;
             this.Name = "FrmFinishImport";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Transfer Data Wizard";
+            this.Text = "Import From Temp Data";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FrmFinishImport_FormClosing);
             this.Load += new System.EventHandler(this.FrmFinishImport_Load);
             this.panel3.ResumeLayout(false);

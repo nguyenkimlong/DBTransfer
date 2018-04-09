@@ -35,11 +35,11 @@
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.chkPosted = new System.Windows.Forms.CheckBox();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.chkoverwrite = new System.Windows.Forms.CheckBox();
             this.btnCancel = new System.Windows.Forms.Button();
             this.btnHelp = new System.Windows.Forms.Button();
             this.btnNext = new System.Windows.Forms.Button();
             this.btnBack = new System.Windows.Forms.Button();
-            this.chkoverwrite = new System.Windows.Forms.CheckBox();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.groupBox1.SuspendLayout();
@@ -113,6 +113,17 @@
             this.panel2.Size = new System.Drawing.Size(684, 74);
             this.panel2.TabIndex = 5;
             // 
+            // chkoverwrite
+            // 
+            this.chkoverwrite.AutoSize = true;
+            this.chkoverwrite.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.chkoverwrite.Location = new System.Drawing.Point(32, 26);
+            this.chkoverwrite.Name = "chkoverwrite";
+            this.chkoverwrite.Size = new System.Drawing.Size(114, 17);
+            this.chkoverwrite.TabIndex = 4;
+            this.chkoverwrite.Text = "OverWrite Data";
+            this.chkoverwrite.UseVisualStyleBackColor = true;
+            // 
             // btnCancel
             // 
             this.btnCancel.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
@@ -160,17 +171,6 @@
             this.btnBack.UseVisualStyleBackColor = true;
             this.btnBack.Click += new System.EventHandler(this.btnBack_Click);
             // 
-            // chkoverwrite
-            // 
-            this.chkoverwrite.AutoSize = true;
-            this.chkoverwrite.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.chkoverwrite.Location = new System.Drawing.Point(32, 26);
-            this.chkoverwrite.Name = "chkoverwrite";
-            this.chkoverwrite.Size = new System.Drawing.Size(114, 17);
-            this.chkoverwrite.TabIndex = 4;
-            this.chkoverwrite.Text = "OverWrite Data";
-            this.chkoverwrite.UseVisualStyleBackColor = true;
-            // 
             // FrmChkPostedImport
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -184,7 +184,7 @@
             this.MinimizeBox = false;
             this.Name = "FrmChkPostedImport";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Transfer Data Wizard";
+            this.Text = "Import From Temp Data";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FrmChkPostedImport_FormClosing);
             this.Load += new System.EventHandler(this.FrmChkPostedImport_Load);
             this.panel1.ResumeLayout(false);

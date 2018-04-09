@@ -296,7 +296,7 @@
             this.MinimizeBox = false;
             this.Name = "FrmTransferDataExport";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Transfer Data Wizard";
+            this.Text = "Export Data To Temp";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FrmTransferDataExport_FormClosing);
             this.Load += new System.EventHandler(this.FrmTransferDataExport_Load);
             this.panel3.ResumeLayout(false);

@@ -33,6 +33,7 @@
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.label2 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.cbbBatchNo = new DevExpress.XtraEditors.LookUpEdit();
             this.dtptodate = new System.Windows.Forms.DateTimePicker();
             this.dtpfromdate = new System.Windows.Forms.DateTimePicker();
             this.chkBatchNo = new System.Windows.Forms.CheckBox();
@@ -44,12 +45,11 @@
             this.btncancel = new System.Windows.Forms.Button();
             this.btnNext = new System.Windows.Forms.Button();
             this.btnBack = new System.Windows.Forms.Button();
-            this.cbbBatchNo = new DevExpress.XtraEditors.LookUpEdit();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.groupBox1.SuspendLayout();
-            this.panel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.cbbBatchNo.Properties)).BeginInit();
+            this.panel2.SuspendLayout();
             this.SuspendLayout();
             // 
             // panel1
@@ -99,6 +99,21 @@
             this.groupBox1.TabIndex = 4;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Filter";
+            // 
+            // cbbBatchNo
+            // 
+            this.cbbBatchNo.EditValue = "";
+            this.cbbBatchNo.Enabled = false;
+            this.cbbBatchNo.Location = new System.Drawing.Point(270, 80);
+            this.cbbBatchNo.Name = "cbbBatchNo";
+            this.cbbBatchNo.Properties.AcceptEditorTextAsNewValue = DevExpress.Utils.DefaultBoolean.True;
+            this.cbbBatchNo.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.cbbBatchNo.Properties.NullText = "";
+            this.cbbBatchNo.Properties.TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.Standard;
+            this.cbbBatchNo.Size = new System.Drawing.Size(349, 20);
+            this.cbbBatchNo.TabIndex = 9;
+            this.cbbBatchNo.EditValueChanged += new System.EventHandler(this.cbbBatchNo_EditValueChanged);
             // 
             // dtptodate
             // 
@@ -222,21 +237,6 @@
             this.btnBack.UseVisualStyleBackColor = true;
             this.btnBack.Click += new System.EventHandler(this.btnBack_Click);
             // 
-            // cbbBatchNo
-            // 
-            this.cbbBatchNo.EditValue = "";
-            this.cbbBatchNo.Enabled = false;
-            this.cbbBatchNo.Location = new System.Drawing.Point(270, 80);
-            this.cbbBatchNo.Name = "cbbBatchNo";
-            this.cbbBatchNo.Properties.AcceptEditorTextAsNewValue = DevExpress.Utils.DefaultBoolean.True;
-            this.cbbBatchNo.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
-            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
-            this.cbbBatchNo.Properties.NullText = "";
-            this.cbbBatchNo.Properties.TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.Standard;
-            this.cbbBatchNo.Size = new System.Drawing.Size(349, 20);
-            this.cbbBatchNo.TabIndex = 9;
-            this.cbbBatchNo.EditValueChanged += new System.EventHandler(this.cbbBatchNo_EditValueChanged);
-            // 
             // FilterImportData
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -250,7 +250,7 @@
             this.MinimizeBox = false;
             this.Name = "FilterImportData";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Transfer Data Wizard";
+            this.Text = "Import From Temp Data";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FilterImportData_FormClosing);
             this.Load += new System.EventHandler(this.FilterImportData_Load);
             this.panel1.ResumeLayout(false);
@@ -258,8 +258,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
-            this.panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.cbbBatchNo.Properties)).EndInit();
+            this.panel2.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }

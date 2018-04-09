@@ -42,8 +42,8 @@ namespace TestFormDB.ExportDataToTemp
         }
 
         private void Bw_DoWork(object sender, DoWorkEventArgs e)
-        {           
-                ProcessImport(e);           
+        {
+            ProcessImport(e);
 
             // bao cao tien do
 
@@ -54,8 +54,8 @@ namespace TestFormDB.ExportDataToTemp
             this.btnFinish.Enabled = true;
             if (string.IsNullOrEmpty(e.Result as string))
             {
-                MessageBox.Show("Export dữ liệu thành công");
-                richTextBox1.Text = richTextBox1.Text + "\r\n" + "Export into table SUCCESS !! " + DateTime.Now.ToLongDateString() + " " + DateTime.Now.ToLongTimeString();
+                MessageBox.Show(@"Export dữ liệu thành công");
+                richTextBox1.Text = richTextBox1.Text + "\r\n" + @"Export into table SUCCESS !! " + DateTime.Now.ToLongDateString() + @" " + DateTime.Now.ToLongTimeString();
             }
             else
             {
@@ -79,26 +79,26 @@ namespace TestFormDB.ExportDataToTemp
                 {
                     table.Add(new DataDetail
                     {
-                        ID = item.SelectNodes("ID").Item(0).InnerText,
-                        Table = item.SelectNodes("Table").Item(0).InnerText,
+                        ID = item.SelectNodes("ID")?.Item(0)?.InnerText,
+                        Table = item.SelectNodes("Table")?.Item(0)?.InnerText,
                         //   Name = item.SelectNodes("Name").Item(0).InnerText,
-                        Condition = item.SelectNodes("Condition").Item(0).InnerText
+                        Condition = item.SelectNodes("Condition")?.Item(0)?.InnerText
                     });
 
                     foreach (XmlNode itemdetail in item.SelectNodes("Detail"))
                     {
                         detail.Add(new Detail
                         {
-                            ID = item.SelectNodes("ID").Item(0).InnerText,
+                            ID = item.SelectNodes("ID")?.Item(0)?.InnerText,
                             DetailName = itemdetail.InnerXml,
                             ConditionDetail = itemdetail.Attributes[0].Value
                         });
                         count.Add(itemdetail.Attributes[0].Value);
                     }
-                    count.Add(item.SelectNodes("Table").Item(0).InnerText);
+                    count.Add(item.SelectNodes("Table")?.Item(0)?.InnerText);
 
                 }
-                var Posted = docProcess.GetElementsByTagName("Posted").Item(0).InnerText;
+                var Posted = docProcess.GetElementsByTagName("Posted")?.Item(0)?.InnerText;
                 //var Overwrite = docProcess.GetElementsByTagName("Overwrite").Item(0).InnerText;
 
                 // kết nối data lấy dữ liệu bảng muốn chuyển
@@ -111,7 +111,7 @@ namespace TestFormDB.ExportDataToTemp
 
                     //Import Master
                     foreach (var tableName in table)
-                    {                            
+                    {
                         //Lấy danh sách Data
                         SqlDataAdapter sqlDA;
                         sqlDA = new SqlDataAdapter("Select " + tableName.Table + ".* from " + tableName.Table + " Where " + tableName.Condition, sourceConnection);
@@ -145,8 +145,7 @@ namespace TestFormDB.ExportDataToTemp
 
                         using (SqlConnection descConnection = new SqlConnection(GetStrConnect.GetStrDsc()))
                         {
-                            descConnection.Open();
-                            CopyData(descConnection, tableName.Table, ds.Tables[0], true, openWith, tableName.Table, null, column[0]);
+                            descConnection.Open();CopyData(descConnection, tableName.Table, ds.Tables[0], true, openWith, tableName.Table, null, column[0]);
                             this.Invoke(OnUpdateLog, "Import " + tableName.Table + ", Rows: " + dataTable.Rows.Count);
                         }
 
@@ -176,6 +175,10 @@ namespace TestFormDB.ExportDataToTemp
                                 var resultsDetail = from tableMaster in dataTable.AsEnumerable()
                                                     join tableDetail in dataTableDetail.AsEnumerable() on tableMaster[0] equals tableDetail[item.ConditionDetail]
                                                     select tableDetail;
+                                if (!resultsDetail.Any())
+                                {
+                                    continue;
+                                }
                                 results = resultsDetail.CopyToDataTable();
                                 //Lấy danh sách Column trong Danh sách
                                 //Lấy Khóa chính trong danh sách Column
@@ -188,18 +191,15 @@ namespace TestFormDB.ExportDataToTemp
                                 using (SqlConnection descConnection = new SqlConnection(GetStrConnect.GetStrDsc()))
                                 {
                                     descConnection.Open();
+
                                     CopyData(descConnection, item.DetailName, results, true, openWithDetail, item.DetailName, null, columnDetail[0]);
                                     this.Invoke(OnUpdateLog, "Import " + item.DetailName + ", Rows: " + results.Rows.Count);
                                 }
                             }
                         }
-                        bw.ReportProgress(100, i);
+                        bw.ReportProgress((100 * (i+1)) / table.Count);
                         i++;
-                    }
-
-
-
-                }
+                    }}
 
                 e.Result = "";
 
@@ -221,6 +221,7 @@ namespace TestFormDB.ExportDataToTemp
                 cmd1.Connection = conn;
                 cmd1.Transaction = tran;
 
+
                 string table = "";
                 table += "IF OBJECT_ID('zzzlvimport" + tablename + "') IS NOT NULL ";
                 table += "BEGIN ";
@@ -231,9 +232,10 @@ namespace TestFormDB.ExportDataToTemp
                 SqlCommand cmd = new SqlCommand();
                 cmd.CommandType = CommandType.Text;
                 cmd.CommandText = table;
-                cmd.Connection = conn;
-                cmd.Transaction = tran;
+                cmd.Connection = conn;cmd.Transaction = tran;
                 cmd.ExecuteNonQuery();
+
+            
 
                 using (SqlBulkCopy bulkCopy = new SqlBulkCopy(conn, SqlBulkCopyOptions.KeepIdentity | SqlBulkCopyOptions.KeepNulls, tran))
                 {
@@ -246,7 +248,7 @@ namespace TestFormDB.ExportDataToTemp
 
                     bulkCopy.WriteToServer(dt);
                     bulkCopy.Close();
-                }             
+                }
                 tran.Commit();
             }
             catch (Exception exp)
@@ -290,7 +292,7 @@ namespace TestFormDB.ExportDataToTemp
 
         private void btnSavelog_Click(object sender, EventArgs e)
         {
-            LogWriter log = new LogWriter(richTextBox1.Text,"export");
+            LogWriter log = new LogWriter(richTextBox1.Text, "export");
             MessageBox.Show("Lưu File thành công");
 
         }

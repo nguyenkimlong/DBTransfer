@@ -177,60 +177,71 @@ namespace TestFormDB.Update_Data
         private void btnDanhsoCtu_Click(object sender, EventArgs e)
         {
             this.Cursor = Cursors.WaitCursor;
-            try
+            string str = "Data Source=" + SrcServerName + ";Database=" + SrcDatabase + ";User Id=" + SrcUserName + ";Password=" + SrcPassword + "; pooling=false";
+            using (SqlConnection sourceConnection = new SqlConnection(str))
             {
-                string str = "Data Source=" + SrcServerName + ";Database=" + SrcDatabase + ";User Id=" + SrcUserName + ";Password=" + SrcPassword + "; pooling=false";
-
-                using (SqlConnection sourceConnection = new SqlConnection(str))
-                {
-                    using (SqlCommand command = new SqlCommand("AD_spAutoNumberList", sourceConnection))
+                sourceConnection.Open();
+                var tran = sourceConnection.BeginTransaction();
+                try
+                {using (SqlCommand command = new SqlCommand("AD_spAutoNumberList", sourceConnection))
                     {
-                        command.CommandType = CommandType.StoredProcedure;
-                        command.Parameters.Add("@FunctionID", SqlDbType.VarChar, 10).Value = data[0].ID;
-                        command.Parameters.Add("@BUID", SqlDbType.VarChar, 30).Value = DBNull.Value;
-                        command.Parameters.Add("@BatchNo", SqlDbType.VarChar, 30).Value = DBNull.Value;
-                        command.Parameters.Add("@UR", SqlDbType.VarChar, 50).Value = DBNull.Value;
-                        command.Parameters.Add("@DD", SqlDbType.Date).Value = DateTime.Now;
-                        command.Parameters.Add("@FP", SqlDbType.VarChar, 20).Value = DBNull.Value;
-                        command.Parameters.Add("@FQ", SqlDbType.VarChar, 20).Value = DBNull.Value;
-                        command.Parameters.Add("@FY", SqlDbType.VarChar, 20).Value = DBNull.Value;
-                        command.Parameters.Add("@out", SqlDbType.VarChar, 1000).Direction = ParameterDirection.Output;
-                        command.Parameters.Add("@NotUpdateLast", SqlDbType.Bit).Value = 0;
-                        sourceConnection.Open();
-                        command.ExecuteNonQuery();
-                        string stringvar = Convert.ToString(command.Parameters["@out"].Value);
-                        ReNumberDocumentID(stringvar);
+                        List<TableNew> table = new List<TableNew>();
 
+                        command.CommandType = CommandType.StoredProcedure;
+                        command.Transaction = tran;
+                        foreach (DataRow row in dataNew.Rows)
+                        {
+                            command.Parameters.Clear();
+                            command.Parameters.Add("@FunctionID", SqlDbType.VarChar, 10).Value = data[0].ID;
+                            command.Parameters.Add("@BUID", SqlDbType.VarChar, 30).Value = DBNull.Value;
+                            command.Parameters.Add("@BatchNo", SqlDbType.VarChar, 30).Value = row["BatchNo"]?? DBNull.Value;
+                            command.Parameters.Add("@UR", SqlDbType.VarChar, 50).Value = DBNull.Value;
+                            command.Parameters.Add("@DD", SqlDbType.Date).Value = row["DocumentDate"].ToString();
+                            command.Parameters.Add("@FP", SqlDbType.VarChar, 20).Value = DBNull.Value;
+                            command.Parameters.Add("@FQ", SqlDbType.VarChar, 20).Value = DBNull.Value;
+                            command.Parameters.Add("@FY", SqlDbType.VarChar, 20).Value = DBNull.Value;command.Parameters.Add("@out", SqlDbType.VarChar, 1000).Direction =ParameterDirection.Output;
+                            command.Parameters.Add("@NotUpdateLast", SqlDbType.Bit).Value = 0;
+                            command.ExecuteNonQuery();
+                            string stringvar = Convert.ToString(command.Parameters["@out"].Value);
+
+                            table.Add(new TableNew
+                            {
+                                IdOld = row["DocumentID"].ToString(),
+                                IdNew = stringvar
+                            });
+                            row.SetField("DocumentID", stringvar);
+
+                        }
+                        tran.Commit();
+                        ReNumberDocumentID(table);
+                    }
+
+                    this.Cursor = Cursors.Default;
+                }
+
+                catch (Exception ex)
+                {
+                    MessageBox.Show(@"Failed , rolling back." + ex.Message);
+                    try
+                    {
+                        tran.Rollback();
+                    }
+                    catch (Exception exRollback)
+                    {
+                        if (!(exRollback is InvalidOperationException)) // connection closed or transaction already rolled back on the server.
+                        {
+                            MessageBox.Show(@"Failed to roll back. " + exRollback.Message);
+                        }
                     }
                 }
-                this.Cursor = Cursors.Default;
             }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-
         }
         /// <summary>
         /// Đánh lại số DocumentID
         /// </summary>
-        /// <param name="stringvar">Số tự động</param>
-        public void ReNumberDocumentID(string stringvar)
+        /// <param name="table">table</param>
+        public void ReNumberDocumentID(List<TableNew> table)
         {
-            List<TableNew> table = new List<TableNew>();
-            string chu = stringvar.Substring(0, 7);
-            int so = int.Parse(stringvar.Substring(stringvar.Length - 4, 4));
-            foreach (DataRow row in dataNew.Rows)
-            {
-                table.Add(new TableNew
-                {
-                    IdOld = row["DocumentID"].ToString(),
-                    IdNew = chu + so.ToString("0000")
-                });
-                so++;
-                row.SetField("DocumentID", chu + so.ToString("0000"));
-            }
-
             //Đánh DocumentID bảng Detail
             foreach (var dataTable in dataTable)
             {
@@ -751,7 +762,7 @@ namespace TestFormDB.Update_Data
             }
             catch (Exception ex)
             {
-                MessageBox.Show(@"Lỗi: "+ ex.Message);
+                MessageBox.Show(@"Lỗi: " + ex.Message);
             }
 
         }
@@ -768,7 +779,7 @@ namespace TestFormDB.Update_Data
                     SqlDataAdapter sqlDA, sqldata;
 
                     //DataTable Master
-                    string ListQuery = "Select * from zzzlvimport" + data[0].Table ;
+                    string ListQuery = "Select * from zzzlvimport" + data[0].Table + " Order by DocumentDate ";
                     sqldata = new SqlDataAdapter(ListQuery, sourceConnection);
                     var dsdata = new DataSet();
                     sqldata.Fill(dsdata);
@@ -804,7 +815,7 @@ namespace TestFormDB.Update_Data
                             string query = "";
                             query = "Select T2.DocumentDate,T1.* ";
                             query += "From " + "zzzlvimport" + item.DetailName + " T1, " + "zzzlvimport" + data[0].Table + " T2 ";
-                            query += " Where " + " T1." + item.ConditionDetail + " = " + " T2." + item.ConditionDetail + " and " + data[0].Condition + " and " + "BatchNo like '" + txtLoChungTu.Text.ToString().Replace("*","%") +"'";
+                            query += " Where " + " T1." + item.ConditionDetail + " = " + " T2." + item.ConditionDetail + " and " + data[0].Condition + " and " + "BatchNo like '" + txtLoChungTu.Text.ToString().Replace("*", "%") + "'";
                             query += " Order by T2.DocumentDate ";
                             sqlDA = new SqlDataAdapter(query, sourceConnection);
 
@@ -838,7 +849,7 @@ namespace TestFormDB.Update_Data
                             string query = "";
                             query = "Select T2.DocumentDate ,T1.* ";
                             query += "From " + "zzzlvimport" + item.DetailName + " T1, " + "zzzlvimport" + data[0].Table + " T2 ";
-                            query += " Where " + " T1." + item.ConditionDetail + " = " + " T2." + item.ConditionDetail + " and " +  data[0].Condition;
+                            query += " Where " + " T1." + item.ConditionDetail + " = " + " T2." + item.ConditionDetail + " and " + data[0].Condition;
                             query += " Order by T2.DocumentDate ";
                             sqlDA = new SqlDataAdapter(query, sourceConnection);
 
@@ -916,7 +927,7 @@ namespace TestFormDB.Update_Data
             }
             catch (Exception ex)
             {
-                MessageBox.Show(@"Lỗi: "+ ex.Message);
+                MessageBox.Show(@"Lỗi: " + ex.Message);
             }
         }
 
@@ -977,8 +988,8 @@ namespace TestFormDB.Update_Data
             var tran = conn.BeginTransaction();
             try
             {
-               var a= dt.Rows.Count;
-                if(detail.Any(o => o.DetailName == tablename))
+                var a = dt.Rows.Count;
+                if (detail.Any(o => o.DetailName == tablename))
                 {
                     if (ColumnNotMap == null) ColumnNotMap = new List<string>();
                     ColumnNotMap.Add("DocumentDate");
@@ -993,7 +1004,7 @@ namespace TestFormDB.Update_Data
 
                     foreach (DataColumn item in dt.Columns)
                     {
-                        if(ColumnNotMap==null || !ColumnNotMap.Contains(item.ColumnName))
+                        if (ColumnNotMap == null || !ColumnNotMap.Contains(item.ColumnName))
                             bulkCopy.ColumnMappings.Add(item.ColumnName, item.ColumnName);
                     }
                     bulkCopy.DestinationTableName = "zzzlvimport" + tablename;
@@ -1029,7 +1040,7 @@ namespace TestFormDB.Update_Data
             }
             catch (Exception ex)
             {
-                MessageBox.Show(@"Lỗi: "+ ex.Message);
+                MessageBox.Show(@"Lỗi: " + ex.Message);
             }
 
 

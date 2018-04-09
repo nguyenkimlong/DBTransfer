@@ -133,7 +133,14 @@ namespace TestFormDB.ImportFromDataTemp
                             if (item.ID == tableName.ID)
                             {
                                 SqlDataAdapter sqlDAdetail;
-                                string query = "Select * From zzzlvimport" + item.DetailName;
+
+                                string query = "";
+                                query += "IF OBJECT_ID('zzzlvimport" + item.DetailName + "') IS NOT NULL ";
+                                query += "BEGIN ";
+                                query += "Select * From zzzlvimport" + item.DetailName + " ";
+                                query += "END else ";
+                                query += "SELECT TOP 0 * INTO zzzlvimport" + item.DetailName + " FROM " + item.DetailName + " ";
+
                                 sqlDAdetail = new SqlDataAdapter(query, sourceConnection);
 
                                 var dsdetail = new DataSet();
@@ -145,13 +152,16 @@ namespace TestFormDB.ImportFromDataTemp
                                 DataTable dataTableDetail = new DataTable();
                                 DataTable results = new DataTable();
 
-
                                 dataTableDetail = dsdetail.Tables[0];
 
 
                                 var resultsDetail = from tableMaster in dataTable.AsEnumerable()
                                                     join tableDetail in dataTableDetail.AsEnumerable() on tableMaster[0] equals tableDetail[item.ConditionDetail]
                                                     select tableDetail;
+                                if (!resultsDetail.Any())
+                                {
+                                    continue;
+                                }
                                 results = resultsDetail.CopyToDataTable();
                                 //Lấy danh sách Column trong Danh sách
                                 //Lấy Khóa chính trong danh sách Column
@@ -187,8 +197,7 @@ namespace TestFormDB.ImportFromDataTemp
             var tran = conn.BeginTransaction();
             try
             {
-                SqlCommand cmd1 = new SqlCommand();
-                cmd1.CommandType = CommandType.Text;
+                SqlCommand cmd1 = new SqlCommand();cmd1.CommandType = CommandType.Text;
                 cmd1.Connection = conn;
                 cmd1.Transaction = tran;
 
@@ -327,7 +336,7 @@ namespace TestFormDB.ImportFromDataTemp
 
         private void btnchitiet_Click(object sender, EventArgs e)
         {
-            string textname ="";
+            string textname = "";
             int textcount = 0;
             List<TableOld> TableOld = new List<TableOld>();
             List<TableNew> TableNew = new List<TableNew>();
@@ -347,7 +356,8 @@ namespace TestFormDB.ImportFromDataTemp
 
                     dsSrc = new DataSet();
                     sqlDA.Fill(dsSrc);
-                    TableOld.Add(new TableOld {
+                    TableOld.Add(new TableOld
+                    {
                         tableNameOld = tableName.Table,
                         RowsCountOld = (int)dsSrc.Tables[0].Rows.Count,
                     });
@@ -409,19 +419,19 @@ namespace TestFormDB.ImportFromDataTemp
                 {
                     foreach (var itemnew in TableNew)
                     {
-                        if (itemold.tableNameOld==itemnew.tableNameNew)
+                        if (itemold.tableNameOld == itemnew.tableNameNew)
                         {
                             textname += itemold.tableNameOld;
                             textname += "\r\n";
 
-                            textcount += itemnew.RowsCountNew-itemold.RowsCountOld;
+                            textcount += itemnew.RowsCountNew - itemold.RowsCountOld;
                             //textcount += ;
 
                         }
                     }
                 }
 
-                MessageBox.Show("", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show(textname + " " + textcount, "", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
 
         }

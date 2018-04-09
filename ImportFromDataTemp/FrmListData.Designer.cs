@@ -35,10 +35,10 @@
             this.btnhelp = new System.Windows.Forms.Button();
             this.panel1 = new System.Windows.Forms.Panel();
             this.panel3 = new System.Windows.Forms.Panel();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.lstwtable = new System.Windows.Forms.ListView();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.panel1.SuspendLayout();
             this.panel3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
@@ -115,6 +115,16 @@
             this.panel3.Size = new System.Drawing.Size(715, 89);
             this.panel3.TabIndex = 48;
             // 
+            // pictureBox1
+            // 
+            this.pictureBox1.Image = global::TestFormDB.Properties.Resources.sql;
+            this.pictureBox1.Location = new System.Drawing.Point(605, 15);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(87, 62);
+            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.pictureBox1.TabIndex = 3;
+            this.pictureBox1.TabStop = false;
+            // 
             // label2
             // 
             this.label2.AutoSize = true;
@@ -148,16 +158,6 @@
             this.lstwtable.DrawItem += new System.Windows.Forms.DrawListViewItemEventHandler(this.lstwtable_DrawItem);
             this.lstwtable.DrawSubItem += new System.Windows.Forms.DrawListViewSubItemEventHandler(this.lstwtable_DrawSubItem);
             // 
-            // pictureBox1
-            // 
-            this.pictureBox1.Image = global::TestFormDB.Properties.Resources.sql;
-            this.pictureBox1.Location = new System.Drawing.Point(605, 15);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(87, 62);
-            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.pictureBox1.TabIndex = 3;
-            this.pictureBox1.TabStop = false;
-            // 
             // FrmListData
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -172,7 +172,7 @@
             this.MinimizeBox = false;
             this.Name = "FrmListData";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Transfer Data Wizard";
+            this.Text = "Import From Temp Data";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FrmListData_FormClosing);
             this.Load += new System.EventHandler(this.FrmListData_Load);
             this.panel1.ResumeLayout(false);
