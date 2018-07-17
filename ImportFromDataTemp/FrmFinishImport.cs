@@ -197,7 +197,7 @@ namespace TestFormDB.ImportFromDataTemp
             var tran = conn.BeginTransaction();
             try
             {
-                SqlCommand cmd1 = new SqlCommand();cmd1.CommandType = CommandType.Text;
+                SqlCommand cmd1 = new SqlCommand(); cmd1.CommandType = CommandType.Text;
                 cmd1.Connection = conn;
                 cmd1.Transaction = tran;
 
@@ -253,6 +253,63 @@ namespace TestFormDB.ImportFromDataTemp
                 }
 
                 cmd1.ExecuteNonQuery();
+
+                string store = "";
+                if (tablename == "CS_tblCashPayment") store = "APP_spUpdateTranCP";
+                if (tablename == "CS_tblCashReceipt") store = "APP_spUpdateTranCR";
+                if (tablename == "IV_tblExpConfirm") store = "APP_spUpdateTranEC";
+                if (tablename == "GL_tblGJEntry") store = "APP_spUpdateTranGJ";
+                if (tablename == "IV_tblInvAdjustment") store = "APP_spUpdateTranIA";
+                if (tablename == "IV_tblImpConfirm") store = "APP_spUpdateTranIC";
+
+                if (tablename == "IV_tblInvTransfer") store = "APP_spUpdateTranIT";
+                if (tablename == "PP_tblItemPurchase") store = "APP_spUpdateTranPI";
+                if (tablename == "SR_tblItemInvoice") store = "APP_spUpdateTranSI";
+                if (tablename == "FA_tblAdjustAsset") store = "APP_spUpdateTranAA";
+                if (tablename == "FA_tblAssetLiquidate") store = "APP_spUpdateTranAL";
+                if (tablename == "FA_tblNewAsset") store = "APP_spUpdateTranAN";
+
+                // kiểm tra
+                if (store != "")
+                {
+                    using (SqlCommand command = new SqlCommand(store, conn))
+                    {
+                        
+                        command.CommandType = CommandType.StoredProcedure;
+                        command.Transaction = tran;
+                        foreach (DataRow row in dt.Rows)
+                        {
+                            command.Parameters.Clear();
+                            command.Parameters.Add("@DocumentID", SqlDbType.VarChar, 30).Value = row["DocumentID"].ToString();
+                            command.Parameters.Add("@UserID", SqlDbType.VarChar, 50).Value = DBNull.Value;
+                            command.Parameters.Add("@BUID", SqlDbType.VarChar,20).Value = DBNull.Value;
+                            command.ExecuteNonQuery();
+                        }
+                    }
+
+                    string AuditCode = store.Substring(store.Length - 2);
+                    //kiểm tra thủ tục khóa sổ
+                    using (SqlCommand command = new SqlCommand("APP_spPostUnPostMaster", conn))
+                    {                      
+                        command.CommandType = CommandType.StoredProcedure;
+                        command.Transaction = tran;
+                        foreach (DataRow row in dt.Rows)
+                        {
+                            if ((bool)row["Posted"] == true)
+                            {
+                                command.Parameters.Clear();
+                                command.Parameters.Add("@AuditCode", SqlDbType.VarChar, 5).Value = AuditCode;
+                                command.Parameters.Add("@DocumentID", SqlDbType.VarChar, 30).Value = row["DocumentID"].ToString();
+                                command.Parameters.Add("@BatchNo", SqlDbType.VarChar, 30).Value = row["BatchNo"].ToString();
+                                command.Parameters.Add("@Posted", SqlDbType.Bit).Value = 1;
+                                command.Parameters.Add("@UserID", SqlDbType.VarChar, 20).Value = DBNull.Value;
+                                command.Parameters.Add("@BUID", SqlDbType.VarChar, 20).Value = DBNull.Value;
+                                command.Parameters.Add("@Err", SqlDbType.VarChar, 1000).Value = DBNull.Value;
+                                command.ExecuteNonQuery();
+                            }
+                        }
+                    }
+                }
                 tran.Commit();
             }
             catch (Exception exp)

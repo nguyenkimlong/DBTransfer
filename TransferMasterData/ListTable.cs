@@ -101,7 +101,6 @@ namespace TestFormDB
             lstwtable.Columns.Add("Data", 500);
 
             ListViewItem itm;
-            string[] chuoitach;
             try
             {
                 XmlDocument docProcess = new XmlDocument();

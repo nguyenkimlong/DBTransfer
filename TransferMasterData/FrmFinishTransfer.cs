@@ -28,6 +28,17 @@ namespace TestFormDB
             {
                 this.richTextBox1.Text += s + "\r\n";
             };
+            
+        }
+        private const int CP_NOCLOSE_BUTTON = 0x200;
+        protected override CreateParams CreateParams
+        {
+            get
+            {
+                CreateParams myCp = base.CreateParams;
+                myCp.ClassStyle = myCp.ClassStyle | CP_NOCLOSE_BUTTON;
+                return myCp;
+            }
         }
 
         private void btnFinish_Click(object sender, EventArgs e)
@@ -51,7 +62,7 @@ namespace TestFormDB
 
         private void Bw_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            this.btnFinish.Enabled = true;
+            this.btnFinish.Enabled = this.btnClose.Enabled = true;
             if (string.IsNullOrEmpty(e.Result as string))
             {
 
@@ -67,16 +78,18 @@ namespace TestFormDB
 
         private void ProcessImport(DoWorkEventArgs e)
         {
+
             try
             {
                 // Đọc File XML Data
                 XmlDocument docProcess = new XmlDocument();
                 docProcess.Load(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location) + "\\dataSrcCheck.xml");
-             
+
                 //lấy Table từ table sau khi check chọn
                 var Table = docProcess.GetElementsByTagName("Function");
 
                 List<DataTransfer> table = new List<DataTransfer>();
+
 
                 foreach (XmlNode item in Table)
                 {
@@ -93,43 +106,74 @@ namespace TestFormDB
                 {
                     sourceConnection.Open();
 
+
                     //Lọc từng Table từ danh sách trong file XML
                     int i = 1;
-                    foreach (var tableName in table)
+
+                    foreach (var tablenameTrans in table)
                     {
-                        //Lấy danh sách Data
-                        SqlDataAdapter sqlDA;
-                        if (tableName.Condition == "")
+                        List<DataTransfer> tabletrans = new List<DataTransfer>();
+                        var tran = sourceConnection.BeginTransaction();
+
+                        using (SqlCommand cmd = new SqlCommand("AD_spImportTable", sourceConnection))
                         {
+                            cmd.CommandType = CommandType.StoredProcedure;
+                            cmd.Transaction = tran;
+                            cmd.Parameters.Add("@TableToInsert", SqlDbType.VarChar, 50).Value = tablenameTrans.Table;
+                            using (SqlDataReader rdr = cmd.ExecuteReader())
+                            {
+                                // iterate through results, printing each to console
+                                while (rdr.Read())
+                                {
+                                    tabletrans.Add(new DataTransfer()
+                                    {
+                                        Table = rdr["TableName"].ToString(),
+                                    });
+                                    //Console.WriteLine("Product: {0,-35} Total: {1,2}", rdr["TableName"], rdr["Level"]);
+                                }
+                            }
+                            tran.Commit();
+                        }
+
+                        foreach (var tableName in tabletrans)
+                        {
+                            //Lấy danh sách Data
+                            SqlDataAdapter sqlDA;
+                            //if (tableName.Condition == "")
+                            //{
+                            //    sqlDA = new SqlDataAdapter("select * from " + tableName.Table, sourceConnection);
+                            //}
+                            //else
+                            //{
+                            //    sqlDA = new SqlDataAdapter("select * from " + tableName.Table + " Where " + tableName.Condition, sourceConnection);
+                            //}
                             sqlDA = new SqlDataAdapter("select * from " + tableName.Table, sourceConnection);
-                        }
-                        else
-                        {
-                            sqlDA = new SqlDataAdapter("select * from " + tableName.Table + " Where " + tableName.Condition, sourceConnection);
-                        }
+                            var ds = new DataSet();
+                            sqlDA.Fill(ds);
 
-                        var ds = new DataSet();
-                        sqlDA.Fill(ds);
+                            //Khởi tạo danh sách Column, dataTable, Khóa chính cột ---- Khi chạy từng vòng lặp
+                            List<string> column = new List<string>();
+                            Dictionary<string, string> openWith = new Dictionary<string, string>();
+                            DataTable dataTable = new DataTable();
+                            dataTable = ds.Tables[0];
 
-                        //Khởi tạo danh sách Column, dataTable, Khóa chính cột ---- Khi chạy từng vòng lặp
-                        List<string> column = new List<string>();
-                        Dictionary<string, string> openWith = new Dictionary<string, string>();
-                        DataTable dataTable = new DataTable();
-                        dataTable = ds.Tables[0];
+                            //Lấy danh sách Column trong Danh sách
+                            //Lấy Khóa chính trong danh sách Column
+                            foreach (var item in dataTable.Columns)
+                            {
+                                openWith.Add(item.ToString(), item.ToString());
+                                column.Add(item.ToString());
+                            }
 
-                        //Lấy danh sách Column trong Danh sách
-                        //Lấy Khóa chính trong danh sách Column
-                        foreach (var item in dataTable.Columns)
-                        {
-                            openWith.Add(item.ToString(), item.ToString());
-                            column.Add(item.ToString());
-                        }
-
-                        using (SqlConnection descConnection = new SqlConnection(GetStrConnect.GetStrDsc()))
-                        {
-                            descConnection.Open();
-                            CopyData(descConnection, tableName.Table, ds.Tables[0], bool.Parse(Overwrite), openWith, tableName.Table, null, column[0]);
-                            this.Invoke(OnUpdateLog, "Import " + tableName.Table + ", Rows: " + dataTable.Rows.Count);
+                            using (SqlConnection descConnection = new SqlConnection(GetStrConnect.GetStrDsc()))
+                            {
+                                descConnection.Open();
+                                CopyData(descConnection, tableName.Table, ds.Tables[0], bool.Parse(Overwrite), openWith, tableName.Table, null, column[0]);
+                                if (tableName.Table == tablenameTrans.Table)
+                                {
+                                    this.Invoke(OnUpdateLog, "Import " + tableName.Table + ", Rows: " + dataTable.Rows.Count);
+                                }
+                            }
                         }
                         bw.ReportProgress((100 * i) / table.Count);
                         i++;
@@ -195,7 +239,7 @@ namespace TestFormDB
 
                 cmd1.ExecuteNonQuery();
                 tran.Commit();
-             
+
             }
             catch (Exception exp)
             {
@@ -250,7 +294,7 @@ namespace TestFormDB
             bw.DoWork += Bw_DoWork;
             bw.ProgressChanged += bw_ProgressChanged;
 
-            this.btnFinish.Enabled = false;
+            this.btnFinish.Enabled = this.btnClose.Enabled = false;
             this.progressBar1.Visible = true;
             bw.RunWorkerAsync();
         }
