@@ -10,6 +10,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml;
+using DevExpress.XtraPrinting.Native;
+using TestFormDB.ShowCommon;
 
 namespace TestFormDB.ImportFromDataTemp
 {
@@ -22,6 +24,8 @@ namespace TestFormDB.ImportFromDataTemp
 
         List<Detail> detail = new List<Detail>();
         List<DataDetail> table = new List<DataDetail>();
+        string Overwrite = "";
+        string Posted = "";
         public FrmFinishImport()
         {
             InitializeComponent();
@@ -44,6 +48,240 @@ namespace TestFormDB.ImportFromDataTemp
             ProcessImport(e);
             // bao cao tien do
 
+        }
+
+        private void ExistTable()
+        {
+            using (SqlConnection sourceConnection = new SqlConnection(GetStrConnect.GetStrSrc()))
+            {
+                sourceConnection.Open(); foreach (var tablenameTrans in table)
+                {
+                    List<DataTransfer> tabletrans = new List<DataTransfer>();
+                    var tran = sourceConnection.BeginTransaction();
+
+                    using (SqlCommand cmd = new SqlCommand("AD_spImportTable", sourceConnection))
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.Transaction = tran;
+                        cmd.Parameters.Add("@TableToInsert", SqlDbType.VarChar, 50).Value = tablenameTrans.Table;
+                        using (SqlDataReader rdr = cmd.ExecuteReader())
+                        {
+                            // iterate through results, printing each to console
+                            while (rdr.Read())
+                            {
+                                if (rdr["TableName"].ToString() == tablenameTrans.Table)
+                                {
+                                    continue;
+                                }
+                                tabletrans.Add(new DataTransfer()
+                                {
+                                    Table = rdr["TableName"].ToString(),
+                                });
+                                //Console.WriteLine("Product: {0,-35} Total: {1,2}", rdr["TableName"], rdr["Level"]);
+                            }
+                        }
+                        tran.Commit();
+                    }
+
+                    foreach (var tableName in tabletrans)
+                    {
+                        SqlDataAdapter sqlDA;
+
+                        sqlDA = new SqlDataAdapter("select * from " + tableName.Table, sourceConnection);
+                        var ds = new DataSet();
+                        sqlDA.Fill(ds);
+
+                        //Khởi tạo danh sách Column, dataTable, Khóa chính cột ---- Khi chạy từng vòng lặp
+                        List<string> column = new List<string>();
+                        Dictionary<string, string> openWith = new Dictionary<string, string>();
+                        DataTable dataTable = new DataTable();
+                        dataTable = ds.Tables[0];
+
+                        //Lấy danh sách Column trong Danh sách
+                        //Lấy Khóa chính trong danh sách Column
+                        foreach (var item in dataTable.Columns)
+                        {
+                            openWith.Add(item.ToString(), item.ToString());
+                            column.Add(item.ToString());
+                        }
+
+                        using (SqlConnection descConnection = new SqlConnection(GetStrConnect.GetStrDsc()))
+                        {
+                            descConnection.Open();
+                            CopyDataExsit(descConnection, tableName.Table, ds.Tables[0], bool.Parse(Overwrite), openWith, tableName.Table, null, column[0]);
+                        }
+                    }
+                }
+
+                foreach (var tablenameTrans in detail)
+                {
+                    List<DataTransfer> tabletrans = new List<DataTransfer>();
+                    var tran = sourceConnection.BeginTransaction();
+
+                    using (SqlCommand cmd = new SqlCommand("AD_spImportTable", sourceConnection))
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.Transaction = tran;
+                        cmd.Parameters.Add("@TableToInsert", SqlDbType.VarChar, 50).Value = tablenameTrans.DetailName;
+                        using (SqlDataReader rdr = cmd.ExecuteReader())
+                        {
+                            // iterate through results, printing each to console
+                            while (rdr.Read())
+                            {
+                                if (rdr["TableName"].ToString() == tablenameTrans.DetailName)
+                                {
+                                    continue;
+                                }
+                                tabletrans.Add(new DataTransfer()
+                                {
+                                    Table = rdr["TableName"].ToString(),
+                                });
+
+                            }
+                        }
+                        tran.Commit();
+                    }
+
+                    foreach (var tableName in tabletrans)
+                    {
+                        SqlDataAdapter sqlDA;
+
+                        sqlDA = new SqlDataAdapter("select * from " + tableName.Table, sourceConnection);
+                        var ds = new DataSet();
+                        sqlDA.Fill(ds);
+
+                        //Khởi tạo danh sách Column, dataTable, Khóa chính cột ---- Khi chạy từng vòng lặp
+                        List<string> column = new List<string>();
+                        Dictionary<string, string> openWith = new Dictionary<string, string>();
+                        DataTable dataTable = new DataTable();
+                        dataTable = ds.Tables[0];
+
+                        //Lấy danh sách Column trong Danh sách
+                        //Lấy Khóa chính trong danh sách Column
+                        foreach (var item in dataTable.Columns)
+                        {
+                            openWith.Add(item.ToString(), item.ToString());
+                            column.Add(item.ToString());
+                        }
+
+                        using (SqlConnection descConnection = new SqlConnection(GetStrConnect.GetStrDsc()))
+                        {
+                            descConnection.Open();
+                            CopyDataExsit(descConnection, tableName.Table, ds.Tables[0], bool.Parse(Overwrite), openWith, tableName.Table, null, column[0]);
+                        }
+                    }
+                }
+            }
+
+
+        }
+        private void ImportData()
+        {
+            // kết nối data lấy dữ liệu bảng muốn chuyển
+            using (SqlConnection sourceConnection = new SqlConnection(GetStrConnect.GetStrDsc()))
+            {
+                sourceConnection.Open();
+
+                //Lọc từng Table từ danh sách trong file XML
+
+                int i = 1;
+                //Import Master
+                foreach (var tableName in table)
+                {
+                    //Lấy danh sách Data
+                    SqlDataAdapter sqlDA;
+                    sqlDA = new SqlDataAdapter("Select zzzlvimport" + tableName.Table + ".* from zzzlvimport" + tableName.Table + " Where " + tableName.Condition, sourceConnection);
+
+
+                    var ds = new DataSet();
+                    sqlDA.Fill(ds);
+
+                    //Khởi tạo danh sách Column, dataTable, Khóa chính cột ----> Khi chạy từng vòng lặp
+                    List<string> column = new List<string>();
+                    Dictionary<string, string> openWith = new Dictionary<string, string>();
+                    DataTable dataTable = new DataTable();
+
+                    //check Posted
+
+                    if (Posted.ToString() == "True" && i == 1)
+                    {
+                        foreach (DataRow row in ds.Tables[0].Rows)
+                        {
+                            row.SetField("Posted", 0);
+                        }
+                    }
+                    dataTable = ds.Tables[0];
+                    //Lấy danh sách Column trong Danh sách
+                    //Lấy Khóa chính trong danh sách Column
+                    foreach (var item in dataTable.Columns)
+                    {
+                        openWith.Add(item.ToString(), item.ToString());
+                        column.Add(item.ToString());
+                    }
+
+                    using (SqlConnection descConnection = new SqlConnection(GetStrConnect.GetStrDsc()))
+                    {
+                        descConnection.Open();
+                        CopyData(descConnection, tableName.Table, ds.Tables[0], bool.Parse(Overwrite), openWith, tableName.Table, null, column[0]);
+                        this.Invoke(OnUpdateLog, "Import " + tableName.Table + ", Rows: " + dataTable.Rows.Count);
+                    }
+                    //===========//
+                    //Import Detail//                      
+                    foreach (var item in detail)
+                    {
+                        if (item.ID == tableName.ID)
+                        {
+                            SqlDataAdapter sqlDAdetail;
+
+                            string query = "";
+                            query += "IF OBJECT_ID('zzzlvimport" + item.DetailName + "') IS NOT NULL ";
+                            query += "BEGIN ";
+                            query += "Select * From zzzlvimport" + item.DetailName + " ";
+                            query += "END else ";
+                            query += "SELECT TOP 0 * INTO zzzlvimport" + item.DetailName + " FROM " + item.DetailName + " ";
+
+                            sqlDAdetail = new SqlDataAdapter(query, sourceConnection);
+
+                            var dsdetail = new DataSet();
+                            sqlDAdetail.Fill(dsdetail);
+
+                            //Khởi tạo danh sách Column, dataTable, Khóa chính cột ----> Khi chạy từng vòng lặp
+                            List<string> columnDetail = new List<string>();
+                            Dictionary<string, string> openWithDetail = new Dictionary<string, string>();
+                            DataTable dataTableDetail = new DataTable();
+                            DataTable results = new DataTable();
+
+                            dataTableDetail = dsdetail.Tables[0];
+
+
+                            var resultsDetail = from tableMaster in dataTable.AsEnumerable()
+                                                join tableDetail in dataTableDetail.AsEnumerable() on tableMaster[0] equals tableDetail[item.ConditionDetail]
+                                                select tableDetail;
+                            if (!resultsDetail.Any())
+                            {
+                                continue;
+                            }
+                            results = resultsDetail.CopyToDataTable();
+                            //Lấy danh sách Column trong Danh sách
+                            //Lấy Khóa chính trong danh sách Column
+                            foreach (var itemDetail in results.Columns)
+                            {
+                                openWithDetail.Add(itemDetail.ToString(), itemDetail.ToString());
+                                columnDetail.Add(itemDetail.ToString());
+                            }
+                            var a = results.Rows.Count;
+                            using (SqlConnection descConnection = new SqlConnection(GetStrConnect.GetStrDsc()))
+                            {
+                                descConnection.Open();
+                                CopyData(descConnection, item.DetailName, results, bool.Parse(Overwrite), openWithDetail, item.DetailName, null, columnDetail[0]);
+                                this.Invoke(OnUpdateLog, "Import " + item.DetailName + ", Rows: " + results.Rows.Count);
+                            }
+                        }
+                    }
+                    bw.ReportProgress((100 * i) / table.Count);
+                    i++;
+                }
+            }
         }
         private void ProcessImport(DoWorkEventArgs e)
         {
@@ -74,115 +312,12 @@ namespace TestFormDB.ImportFromDataTemp
                         });
                     }
                 }
-                var Posted = docProcess.GetElementsByTagName("Posted").Item(0).InnerText;
-                var Overwrite = docProcess.GetElementsByTagName("OverWrite").Item(0).InnerText;
+                Posted = docProcess.GetElementsByTagName("Posted").Item(0).InnerText;
+                Overwrite = docProcess.GetElementsByTagName("OverWrite").Item(0).InnerText;
 
-                // kết nối data lấy dữ liệu bảng muốn chuyển
-                using (SqlConnection sourceConnection = new SqlConnection(GetStrConnect.GetStrDsc()))
-                {
-                    sourceConnection.Open();
+                //ExistTable();
 
-                    //Lọc từng Table từ danh sách trong file XML
-
-                    int i = 1;
-                    //Import Master
-                    foreach (var tableName in table)
-                    {
-
-                        //Lấy danh sách Data
-                        SqlDataAdapter sqlDA;
-                        sqlDA = new SqlDataAdapter("Select zzzlvimport" + tableName.Table + ".* from zzzlvimport" + tableName.Table + " Where " + tableName.Condition, sourceConnection);
-
-
-                        var ds = new DataSet();
-                        sqlDA.Fill(ds);
-
-                        //Khởi tạo danh sách Column, dataTable, Khóa chính cột ----> Khi chạy từng vòng lặp
-                        List<string> column = new List<string>();
-                        Dictionary<string, string> openWith = new Dictionary<string, string>();
-                        DataTable dataTable = new DataTable();
-
-                        //check Posted
-
-                        if (Posted.ToString() == "True" && i == 1)
-                        {
-                            foreach (DataRow row in ds.Tables[0].Rows)
-                            {
-                                row.SetField("Posted", 0);
-                            }
-                        }
-                        dataTable = ds.Tables[0];
-                        //Lấy danh sách Column trong Danh sách
-                        //Lấy Khóa chính trong danh sách Column
-                        foreach (var item in dataTable.Columns)
-                        {
-                            openWith.Add(item.ToString(), item.ToString());
-                            column.Add(item.ToString());
-                        }
-
-                        using (SqlConnection descConnection = new SqlConnection(GetStrConnect.GetStrDsc()))
-                        {
-                            descConnection.Open();
-                            CopyData(descConnection, tableName.Table, ds.Tables[0], bool.Parse(Overwrite), openWith, tableName.Table, null, column[0]);
-                            this.Invoke(OnUpdateLog, "Import " + tableName.Table + ", Rows: " + dataTable.Rows.Count);
-                        }
-                        //===========//
-                        //Import Detail//                      
-                        foreach (var item in detail)
-                        {
-                            if (item.ID == tableName.ID)
-                            {
-                                SqlDataAdapter sqlDAdetail;
-
-                                string query = "";
-                                query += "IF OBJECT_ID('zzzlvimport" + item.DetailName + "') IS NOT NULL ";
-                                query += "BEGIN ";
-                                query += "Select * From zzzlvimport" + item.DetailName + " ";
-                                query += "END else ";
-                                query += "SELECT TOP 0 * INTO zzzlvimport" + item.DetailName + " FROM " + item.DetailName + " ";
-
-                                sqlDAdetail = new SqlDataAdapter(query, sourceConnection);
-
-                                var dsdetail = new DataSet();
-                                sqlDAdetail.Fill(dsdetail);
-
-                                //Khởi tạo danh sách Column, dataTable, Khóa chính cột ----> Khi chạy từng vòng lặp
-                                List<string> columnDetail = new List<string>();
-                                Dictionary<string, string> openWithDetail = new Dictionary<string, string>();
-                                DataTable dataTableDetail = new DataTable();
-                                DataTable results = new DataTable();
-
-                                dataTableDetail = dsdetail.Tables[0];
-
-
-                                var resultsDetail = from tableMaster in dataTable.AsEnumerable()
-                                                    join tableDetail in dataTableDetail.AsEnumerable() on tableMaster[0] equals tableDetail[item.ConditionDetail]
-                                                    select tableDetail;
-                                if (!resultsDetail.Any())
-                                {
-                                    continue;
-                                }
-                                results = resultsDetail.CopyToDataTable();
-                                //Lấy danh sách Column trong Danh sách
-                                //Lấy Khóa chính trong danh sách Column
-                                foreach (var itemDetail in results.Columns)
-                                {
-                                    openWithDetail.Add(itemDetail.ToString(), itemDetail.ToString());
-                                    columnDetail.Add(itemDetail.ToString());
-                                }
-                                var a = results.Rows.Count;
-                                using (SqlConnection descConnection = new SqlConnection(GetStrConnect.GetStrDsc()))
-                                {
-                                    descConnection.Open();
-                                    CopyData(descConnection, item.DetailName, results, bool.Parse(Overwrite), openWithDetail, item.DetailName, null, columnDetail[0]);
-                                    this.Invoke(OnUpdateLog, "Import " + item.DetailName + ", Rows: " + results.Rows.Count);
-                                }
-                            }
-                        }
-                        bw.ReportProgress((100 * i) / table.Count);
-                        i++;
-                    }
-                }
+                ImportData();
 
                 e.Result = "";
 
@@ -190,6 +325,66 @@ namespace TestFormDB.ImportFromDataTemp
             catch (Exception ex)
             {
                 e.Result = ex.Message;
+            }
+        }
+
+        public static void CopyDataExsit(SqlConnection conn, string tablename, DataTable dt, bool overwrite, Dictionary<string, string> cloumnMap, string tableMaster, string tableDetail, string ColumnKey)
+        {
+            var tran = conn.BeginTransaction();
+            try
+            {
+
+                SqlCommand cmd1 = new SqlCommand();
+                cmd1.CommandType = CommandType.Text;
+                cmd1.Connection = conn;
+                cmd1.Transaction = tran;
+
+                string table = "";
+                table += "IF OBJECT_ID('tempdb..#zzzlvimport" + tablename + "') IS NOT NULL ";
+                table += "BEGIN ";
+                table += "DROP TABLE #zzzlvimport" + tablename + " ";
+                table += "END ";
+                table += "SELECT TOP 0 * INTO #zzzlvimport" + tablename + " FROM " + tablename + " ";
+
+                SqlCommand cmd = new SqlCommand();
+                cmd.CommandType = CommandType.Text;
+                cmd.CommandText = table;
+                cmd.Connection = conn;
+                cmd.Transaction = tran;
+                cmd.ExecuteNonQuery();
+
+                using (SqlBulkCopy bulkCopy = new SqlBulkCopy(conn, SqlBulkCopyOptions.KeepIdentity | SqlBulkCopyOptions.KeepNulls, tran))
+                {
+                    bulkCopy.DestinationTableName = "#zzzlvimport" + tablename;
+
+                    foreach (var item in cloumnMap)
+                    {
+                        bulkCopy.ColumnMappings.Add(item.Key, item.Value);
+                    }
+
+                    bulkCopy.WriteToServer(dt);
+                    bulkCopy.Close();
+                }
+
+                var insertString = InsertString(cloumnMap)[0];
+                var insertStringAlias = InsertString(cloumnMap)[1];
+
+                var keyCol = ColumnKey;
+                if (string.IsNullOrEmpty(keyCol)) keyCol = "DocumentID";
+
+                //change code
+
+                cmd1.CommandText = "INSERT INTO " + tablename + "(" + insertString + ") SELECT " + insertStringAlias + " FROM #zzzlvimport" + tablename + " T LEFT JOIN " + tablename + " M ON T." + keyCol + "= M." + keyCol + " WHERE M." + keyCol + " IS NULL";
+
+
+                cmd1.ExecuteNonQuery();
+                tran.Commit();
+
+            }
+            catch (Exception exp)
+            {
+                tran.Rollback();
+                throw exp;
             }
         }
         public static void CopyData(SqlConnection conn, string tablename, DataTable dt, bool overwrite, Dictionary<string, string> cloumnMap, string tableMaster, string tableDetail, string ColumnKey)
@@ -274,23 +469,40 @@ namespace TestFormDB.ImportFromDataTemp
                 {
                     using (SqlCommand command = new SqlCommand(store, conn))
                     {
-                        
+
                         command.CommandType = CommandType.StoredProcedure;
                         command.Transaction = tran;
                         foreach (DataRow row in dt.Rows)
                         {
-                            command.Parameters.Clear();
-                            command.Parameters.Add("@DocumentID", SqlDbType.VarChar, 30).Value = row["DocumentID"].ToString();
-                            command.Parameters.Add("@UserID", SqlDbType.VarChar, 50).Value = DBNull.Value;
-                            command.Parameters.Add("@BUID", SqlDbType.VarChar,20).Value = DBNull.Value;
-                            command.ExecuteNonQuery();
+                            try
+                            {
+                                command.Parameters.Clear();
+                                command.Parameters.Add("@DocumentID", SqlDbType.VarChar, 30).Value = row["DocumentID"].ToString();
+                                command.Parameters.Add("@UserID", SqlDbType.VarChar, 50).Value = DBNull.Value;
+
+                                if (store == "APP_spUpdateTranAA" || store == "APP_spUpdateTranAN")
+                                {
+                                    command.Parameters.Add("@BUID", SqlDbType.VarChar, 20).Value = row["BUID"].ToString();
+                                }
+                                else
+                                {
+                                    command.Parameters.Add("@BUID", SqlDbType.VarChar, 20).Value = DBNull.Value;
+                                }
+
+                                command.ExecuteNonQuery();}
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine(ex);
+                                throw;
+                            }
+                          
                         }
                     }
 
                     string AuditCode = store.Substring(store.Length - 2);
                     //kiểm tra thủ tục khóa sổ
                     using (SqlCommand command = new SqlCommand("APP_spPostUnPostMaster", conn))
-                    {                      
+                    {
                         command.CommandType = CommandType.StoredProcedure;
                         command.Transaction = tran;
                         foreach (DataRow row in dt.Rows)
@@ -350,10 +562,32 @@ namespace TestFormDB.ImportFromDataTemp
             }
         }
 
+        private void DeleteTableTemp()
+        {
+            using (SqlConnection connect = new SqlConnection(GetStrConnect.GetStrDsc()))
+            {
+                connect.Open();
+
+                SqlDataAdapter sqlDAdetail;
+
+                string query = "SELECT name FROM sys.tables WHERE name LIKE 'zzzlvimport%'";
+
+                sqlDAdetail = new SqlDataAdapter(query, connect);
+
+                var dsdetail = new DataSet();
+                sqlDAdetail.Fill(dsdetail);
+                var ListItem = dsdetail.Tables[0]; foreach (DataRow item in ListItem.Rows)
+                {
+                    SqlCommand command = new SqlCommand("DROP TABLE " + item["name"], connect);
+                    command.ExecuteNonQuery();
+                }
+            }
+        }
 
 
         private void btnFinish_Click(object sender, EventArgs e)
         {
+            DeleteTableTemp();
             Close();
         }
 
@@ -487,11 +721,13 @@ namespace TestFormDB.ImportFromDataTemp
                         }
                     }
                 }
-
-                MessageBox.Show(textname + " " + textcount, "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                FrmShow frmShow=new FrmShow(textname + " " + textcount);
+                frmShow.Show();
+                //MessageBox.Show(textname + " " + textcount, "", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-
         }
+
+
         private class TableOld
         {
             public string tableNameOld { get; set; }

@@ -29,10 +29,9 @@ namespace TestFormDB
 
         private void btnback_Click(object sender, EventArgs e)
         {
-            FrmWelcomeMaster transfer = new FrmWelcomeMaster();
+            FormMain formMain = new FormMain();
             Hide();
-            transfer.Show();
-        }
+            formMain.Show();}
 
         private void btnnext_Click(object sender, EventArgs e)
         {

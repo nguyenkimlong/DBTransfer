@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml;
+using DevExpress.XtraEditors;
 
 namespace TestFormDB.ImportFromDataTemp
 {
@@ -23,6 +24,8 @@ namespace TestFormDB.ImportFromDataTemp
             InitializeComponent();
             dtpfromdate.CustomFormat = "dd/MM/yyyy";
             dtptodate.CustomFormat = "dd/MM/yyyy";
+            dtpfromdate.Value=DateTime.Now;
+            dtptodate.Value=DateTime.Now;
             GetDatabaseList();
         }
 
@@ -37,6 +40,7 @@ namespace TestFormDB.ImportFromDataTemp
         {
             try
             {
+                string[] BatchCheck = gridLookUpEditBatch.Text.Split(',');
                 DataTable dtLockData = new DataTable();
                 DataTable dtdata = new DataTable();
                 using (SqlConnection conn = new SqlConnection(GetStrConnect.GetStrSrc()))
@@ -60,7 +64,14 @@ namespace TestFormDB.ImportFromDataTemp
                         cmd1.CommandType = CommandType.Text;
                         if (chkDocDate.Checked && chkBatchNo.Checked)
                         {
-                            cmd1.CommandText = "select * from " + data[0].Table + " Where " + Condition + "  DocumentDate between '" + dtpfromdate.Value.ToShortDateString() + "' and '" + dtptodate.Value.ToShortDateString() + "' and BatchNo like '" + cbbBatchNo.Text.ToString().Replace("*", "%") + "'";
+                            cmd1.CommandText = $"select * from  {data[0].Table}  Where  {Condition}  DocumentDate between  '{dtpfromdate.Value.ToShortDateString()}'  and  '{dtptodate.Value.ToShortDateString()}' and";
+                            cmd1.CommandText += "(";
+                            foreach (var value in BatchCheck)
+                            {
+                                cmd1.CommandText += $" BatchNo = '{value}' or";
+                            }
+                            cmd1.CommandText = cmd1.CommandText.Substring(0, cmd1.CommandText.Length - 2);
+                            cmd1.CommandText += ")";
                             dtdata.Load(cmd1.ExecuteReader());
                             if (dtdata.Rows.Count <= 0)
                             {
@@ -91,7 +102,14 @@ namespace TestFormDB.ImportFromDataTemp
 
                         else if (chkBatchNo.Checked)
                         {
-                            cmd1.CommandText = "select * from " + data[0].Table + " Where " + Condition + "  BatchNo like '" + cbbBatchNo.Text.ToString().Replace("*", "%") + "'";
+                            cmd1.CommandText = $"select * from {data[0].Table}  Where  {Condition} ";
+                            cmd1.CommandText += "(";
+                            foreach (var value in BatchCheck)
+                            {
+                                cmd1.CommandText += $" BatchNo =  '{value}' or";
+                            }
+                            cmd1.CommandText = cmd1.CommandText.Substring(0, cmd1.CommandText.Length - 2);
+                            cmd1.CommandText += ")";
                             dtdata.Load(cmd1.ExecuteReader());
                             if (dtdata.Rows.Count <= 0)
                             {
@@ -203,7 +221,7 @@ namespace TestFormDB.ImportFromDataTemp
                 return;
             }
 
-
+            string[] BatchCheck = gridLookUpEditBatch.Text.Split(',');
 
             XmlWriterSettings settings = new XmlWriterSettings();
             settings.Indent = true;
@@ -223,13 +241,28 @@ namespace TestFormDB.ImportFromDataTemp
                 writer.WriteElementString("Language", item.Language);
                 if (chkDocDate.Checked && chkBatchNo.Checked)
                 {
-                    writer.WriteElementString("Condition", item.Condition + " And DocumentDate between '" + dtpfromdate.Value.ToShortDateString() + "' and '" + dtptodate.Value.ToShortDateString() + "' and BatchNo ='" + cbbBatchNo.Text.ToString() + "'");
+                    string condition = $"{item.Condition}  And DocumentDate between  '{dtpfromdate.Value.ToShortDateString()}' and  '{dtptodate.Value.ToShortDateString()}' and";
+                    condition += "(";
+                    foreach (var batchno in BatchCheck)
+                    {
+                        condition += $" BatchNo = '{batchno}' or";
+                    }
+                    condition = condition.Substring(0, condition.Length - 2);
+                    condition += ")";
+                    writer.WriteElementString("Condition", condition);
                 }
-                else
-                {
+                else{
                     if (chkBatchNo.Checked)
                     {
-                        writer.WriteElementString("Condition", item.Condition + " and BatchNo ='" + cbbBatchNo.Text.ToString() + "'");
+                        string condition = $"{item.Condition} and ";
+                        condition += "(";
+                        foreach (var batchno in BatchCheck)
+                        {
+                            condition += $" BatchNo = '{batchno}' or";
+                        }
+                        condition = condition.Substring(0, condition.Length - 2);
+                        condition += ")";
+                        writer.WriteElementString("Condition", condition);
                     }
                     else if (chkDocDate.Checked)
                     {
@@ -238,8 +271,7 @@ namespace TestFormDB.ImportFromDataTemp
                     else
                     {
                         writer.WriteElementString("Condition", item.Condition);
-                    }
-                }
+                    }}
                 //writer.WriteElementString("Condition", item.Condition);
                 foreach (var itemdetail in detail)
                 {
@@ -324,10 +356,9 @@ namespace TestFormDB.ImportFromDataTemp
                         var ds = new DataSet();
                         adapter.Fill(ds);
 
-                        cbbBatchNo.Properties.DataSource = ds.Tables[0];
-
-                        cbbBatchNo.Properties.DisplayMember = "BatchNo";
-                        cbbBatchNo.Properties.ValueMember = "BatchNo";
+                        gridLookUpEditBatch.Properties.DataSource = ds.Tables[0];
+                        gridLookUpEditBatch.Properties.DisplayMember = "BatchNo";
+                        gridLookUpEditBatch.Properties.ValueMember = "BatchNo";
                     }
                 }
 
@@ -358,7 +389,7 @@ namespace TestFormDB.ImportFromDataTemp
 
         private void chkBatchNo_CheckedChanged(object sender, EventArgs e)
         {
-            cbbBatchNo.Enabled = chkBatchNo.Checked;
+            gridLookUpEditBatch.Enabled = chkBatchNo.Checked;
         }
 
         private void chkDocDate_CheckedChanged(object sender, EventArgs e)
@@ -377,7 +408,29 @@ namespace TestFormDB.ImportFromDataTemp
 
         private void cbbBatchNo_EditValueChanged(object sender, EventArgs e)
         {
-            cbbBatchNo.Text = cbbBatchNo.Text.ToString();
+            gridLookUpEditBatch.Text = gridLookUpEditBatch.Text.ToString();
+        }
+
+        private void gridLookUpEditBatch_Closed(object sender, DevExpress.XtraEditors.Controls.ClosedEventArgs e)
+        {
+            (sender as GridLookUpEdit).LookAndFeel.UpdateStyleSettings();
+        }
+
+        private void gridLookUpEditBatch_CustomDisplayText(object sender, DevExpress.XtraEditors.Controls.CustomDisplayTextEventArgs e)
+        {
+            var editor = sender as GridLookUpEdit;
+            var view = editor.Properties.View; var selectedRowsCount = view.GetSelectedRows().Count();
+
+            List<string> values = new List<string>();
+            foreach (int rowHandle in view.GetSelectedRows())
+                values.Add(view.GetRowCellValue(rowHandle, "BatchNo").ToString());
+            if (selectedRowsCount > 0)
+                e.DisplayText = string.Join(",", values);
+        }
+
+        private void gridLookUpEditBatch_TextChanged(object sender, EventArgs e)
+        {
+            GetDatabaseList();
         }
     }
 }

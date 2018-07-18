@@ -33,7 +33,8 @@
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.label2 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.cbbBatchNo = new DevExpress.XtraEditors.LookUpEdit();
+            this.gridLookUpEditBatch = new DevExpress.XtraEditors.GridLookUpEdit();
+            this.gridLookUpEdit1View = new DevExpress.XtraGrid.Views.Grid.GridView();
             this.dtptodate = new System.Windows.Forms.DateTimePicker();
             this.dtpfromdate = new System.Windows.Forms.DateTimePicker();
             this.chkBatchNo = new System.Windows.Forms.CheckBox();
@@ -48,7 +49,8 @@
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.groupBox1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.cbbBatchNo.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.gridLookUpEditBatch.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.gridLookUpEdit1View)).BeginInit();
             this.panel2.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -85,7 +87,7 @@
             // 
             // groupBox1
             // 
-            this.groupBox1.Controls.Add(this.cbbBatchNo);
+            this.groupBox1.Controls.Add(this.gridLookUpEditBatch);
             this.groupBox1.Controls.Add(this.dtptodate);
             this.groupBox1.Controls.Add(this.dtpfromdate);
             this.groupBox1.Controls.Add(this.chkBatchNo);
@@ -100,20 +102,30 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Filter";
             // 
-            // cbbBatchNo
+            // gridLookUpEditBatch
             // 
-            this.cbbBatchNo.EditValue = "";
-            this.cbbBatchNo.Enabled = false;
-            this.cbbBatchNo.Location = new System.Drawing.Point(270, 80);
-            this.cbbBatchNo.Name = "cbbBatchNo";
-            this.cbbBatchNo.Properties.AcceptEditorTextAsNewValue = DevExpress.Utils.DefaultBoolean.True;
-            this.cbbBatchNo.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            this.gridLookUpEditBatch.EditValue = "";
+            this.gridLookUpEditBatch.Enabled = false;
+            this.gridLookUpEditBatch.Location = new System.Drawing.Point(270, 83);
+            this.gridLookUpEditBatch.Name = "gridLookUpEditBatch";
+            this.gridLookUpEditBatch.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
-            this.cbbBatchNo.Properties.NullText = "";
-            this.cbbBatchNo.Properties.TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.Standard;
-            this.cbbBatchNo.Size = new System.Drawing.Size(349, 20);
-            this.cbbBatchNo.TabIndex = 10;
-            this.cbbBatchNo.EditValueChanged += new System.EventHandler(this.cbbBatchNo_EditValueChanged);
+            this.gridLookUpEditBatch.Properties.TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.Standard;
+            this.gridLookUpEditBatch.Properties.View = this.gridLookUpEdit1View;
+            this.gridLookUpEditBatch.Size = new System.Drawing.Size(349, 20);
+            this.gridLookUpEditBatch.TabIndex = 12;
+            this.gridLookUpEditBatch.Closed += new DevExpress.XtraEditors.Controls.ClosedEventHandler(this.gridLookUpEditBatch_Closed);
+            this.gridLookUpEditBatch.CustomDisplayText += new DevExpress.XtraEditors.Controls.CustomDisplayTextEventHandler(this.gridLookUpEditBatch_CustomDisplayText);
+            this.gridLookUpEditBatch.TextChanged += new System.EventHandler(this.gridLookUpEditBatch_TextChanged);
+            // 
+            // gridLookUpEdit1View
+            // 
+            this.gridLookUpEdit1View.FocusRectStyle = DevExpress.XtraGrid.Views.Grid.DrawFocusRectStyle.RowFocus;
+            this.gridLookUpEdit1View.Name = "gridLookUpEdit1View";
+            this.gridLookUpEdit1View.OptionsSelection.EnableAppearanceFocusedCell = false;
+            this.gridLookUpEdit1View.OptionsSelection.MultiSelect = true;
+            this.gridLookUpEdit1View.OptionsSelection.MultiSelectMode = DevExpress.XtraGrid.Views.Grid.GridMultiSelectMode.CheckBoxRowSelect;
+            this.gridLookUpEdit1View.OptionsView.ShowGroupPanel = false;
             // 
             // dtptodate
             // 
@@ -258,7 +270,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.cbbBatchNo.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.gridLookUpEditBatch.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.gridLookUpEdit1View)).EndInit();
             this.panel2.ResumeLayout(false);
             this.ResumeLayout(false);
 
@@ -281,6 +294,7 @@
         private System.Windows.Forms.Button btnNext;
         private System.Windows.Forms.Button btnBack;
         private System.Windows.Forms.PictureBox pictureBox1;
-        private DevExpress.XtraEditors.LookUpEdit cbbBatchNo;
+        private DevExpress.XtraEditors.GridLookUpEdit gridLookUpEditBatch;
+        private DevExpress.XtraGrid.Views.Grid.GridView gridLookUpEdit1View;
     }
 }

@@ -26,22 +26,21 @@ namespace TestFormDB
             switch (radio.Name)
             {
                 case "rdbtnTransfer":
-                    FrmWelcomeMaster frm = new FrmWelcomeMaster();
+                    ListTable ListTable = new ListTable();
                     this.Hide();
-                    frm.Show();
+                    ListTable.Show();
                     break;
 
                 case "rdbtnExport":
-                    FormWelcome formWelcome = new FormWelcome();
+                    FrmListTableSource FrmListTableSource = new FrmListTableSource();
                     this.Hide();
-                    formWelcome.Show();
+                    FrmListTableSource.Show();
                     break;
 
                 case "rdbtnImport":
-                    FrmWelcomeImport frmWelcome = new FrmWelcomeImport();
+                    FrmListData FrmListData = new FrmListData();
                     this.Hide();
-                    frmWelcome.Show();
-                    break;
+                    FrmListData.Show();break;
 
                 case "rdbtnUpdate":
                     FrmAdjustData srcUpdate = new FrmAdjustData();

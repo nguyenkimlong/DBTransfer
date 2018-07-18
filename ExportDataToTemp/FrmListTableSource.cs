@@ -73,9 +73,9 @@ namespace TestFormDB.ExportDataToTemp
 
         private void btnback_Click(object sender, EventArgs e)
         {
-            FormWelcome frmTransferDes = new FormWelcome();
+            FormMain formMain = new FormMain();
             Hide();
-            frmTransferDes.Show();
+            formMain.Show();
         }
 
         private void btncancel_Click(object sender, EventArgs e)
@@ -95,8 +95,7 @@ namespace TestFormDB.ExportDataToTemp
             lstwtable.Columns.Add("Data", 500);
 
             ListViewItem itm;
-            string[] chuoitach;
-            try
+            string[] chuoitach;try
             {
                 XmlDocument docProcess = new XmlDocument();
                 docProcess.Load(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location) + "\\MappingTransactionData.xml");

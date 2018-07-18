@@ -158,6 +158,7 @@
             this.btnchitiet.TabIndex = 5;
             this.btnchitiet.Text = "Detail ";
             this.btnchitiet.UseVisualStyleBackColor = true;
+            this.btnchitiet.Visible = false;
             this.btnchitiet.Click += new System.EventHandler(this.btnchitiet_Click);
             // 
             // progressBar1

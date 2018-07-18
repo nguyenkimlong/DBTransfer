@@ -24,9 +24,9 @@ namespace TestFormDB.ImportFromDataTemp
 
         private void btnback_Click(object sender, EventArgs e)
         {
-            FrmWelcomeImport frmTransferDes = new FrmWelcomeImport();
+            FormMain formMain = new FormMain();
             Hide();
-            frmTransferDes.Show();
+            formMain.Show();
         }
 
         private void btnnext_Click(object sender, EventArgs e)
