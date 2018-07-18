@@ -188,9 +188,11 @@ namespace TestFormDB.ImportFromDataTemp
                 //Import Master
                 foreach (var tableName in table)
                 {
+                    string queryImport = "Select zzzlvimport" + tableName.Table + ".* from zzzlvimport" +
+                                         tableName.Table + " Where " + tableName.Condition;
                     //Lấy danh sách Data
                     SqlDataAdapter sqlDA;
-                    sqlDA = new SqlDataAdapter("Select zzzlvimport" + tableName.Table + ".* from zzzlvimport" + tableName.Table + " Where " + tableName.Condition, sourceConnection);
+                    sqlDA = new SqlDataAdapter(queryImport, sourceConnection);
 
 
                     var ds = new DataSet();
@@ -233,12 +235,7 @@ namespace TestFormDB.ImportFromDataTemp
                         {
                             SqlDataAdapter sqlDAdetail;
 
-                            string query = "";
-                            query += "IF OBJECT_ID('zzzlvimport" + item.DetailName + "') IS NOT NULL ";
-                            query += "BEGIN ";
-                            query += "Select * From zzzlvimport" + item.DetailName + " ";
-                            query += "END else ";
-                            query += "SELECT TOP 0 * INTO zzzlvimport" + item.DetailName + " FROM " + item.DetailName + " ";
+                            string query = $" SELECT  zzzlvimport{item.DetailName}.*  FROM zzzlvimport{item.DetailName} ,zzzlvimport{tableName.Table}  Where  {tableName.Condition} and  zzzlvimport{tableName.Table}.{item.ConditionDetail}=zzzlvimport{item.DetailName}.{item.ConditionDetail}";
 
                             sqlDAdetail = new SqlDataAdapter(query, sourceConnection);
 
@@ -248,33 +245,32 @@ namespace TestFormDB.ImportFromDataTemp
                             //Khởi tạo danh sách Column, dataTable, Khóa chính cột ----> Khi chạy từng vòng lặp
                             List<string> columnDetail = new List<string>();
                             Dictionary<string, string> openWithDetail = new Dictionary<string, string>();
-                            DataTable dataTableDetail = new DataTable();
-                            DataTable results = new DataTable();
+                            //DataTable dataTableDetail = new DataTable();
+                            //DataTable results = new DataTable();
 
-                            dataTableDetail = dsdetail.Tables[0];
+                            //dataTableDetail = dsdetail.Tables[0];
 
 
-                            var resultsDetail = from tableMaster in dataTable.AsEnumerable()
-                                                join tableDetail in dataTableDetail.AsEnumerable() on tableMaster[0] equals tableDetail[item.ConditionDetail]
-                                                select tableDetail;
-                            if (!resultsDetail.Any())
-                            {
-                                continue;
-                            }
-                            results = resultsDetail.CopyToDataTable();
+                            //var resultsDetail = from tableMaster in dataTable.AsEnumerable()
+                            //                    join tableDetail in dataTableDetail.AsEnumerable() on tableMaster[0] equals tableDetail[item.ConditionDetail]
+                            //                    select tableDetail;
+                            //if (!resultsDetail.Any())
+                            //{
+                            //    continue;
+                            //}
+                            //results = resultsDetail.CopyToDataTable();
                             //Lấy danh sách Column trong Danh sách
                             //Lấy Khóa chính trong danh sách Column
-                            foreach (var itemDetail in results.Columns)
+                            foreach (var itemDetail in dsdetail.Tables[0].Columns)
                             {
                                 openWithDetail.Add(itemDetail.ToString(), itemDetail.ToString());
                                 columnDetail.Add(itemDetail.ToString());
-                            }
-                            var a = results.Rows.Count;
+                            }var a = dsdetail.Tables[0].Rows.Count;
                             using (SqlConnection descConnection = new SqlConnection(GetStrConnect.GetStrDsc()))
                             {
                                 descConnection.Open();
-                                CopyData(descConnection, item.DetailName, results, bool.Parse(Overwrite), openWithDetail, item.DetailName, null, columnDetail[0]);
-                                this.Invoke(OnUpdateLog, "Import " + item.DetailName + ", Rows: " + results.Rows.Count);
+                                CopyData(descConnection, item.DetailName, dsdetail.Tables[0], bool.Parse(Overwrite), openWithDetail, item.DetailName, null, columnDetail[0]);
+                                this.Invoke(OnUpdateLog, "Import " + item.DetailName + ", Rows: " + dsdetail.Tables[0].Rows.Count);
                             }
                         }
                     }

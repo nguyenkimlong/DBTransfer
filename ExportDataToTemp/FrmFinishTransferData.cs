@@ -113,8 +113,9 @@ namespace TestFormDB.ExportDataToTemp
                     foreach (var tableName in table)
                     {
                         //Lấy danh sách Data
+                        string queryMaster=$"Select  {tableName.Table}.* from  {tableName.Table}  Where  {tableName.Condition}";
                         SqlDataAdapter sqlDA;
-                        sqlDA = new SqlDataAdapter("Select " + tableName.Table + ".* from " + tableName.Table + " Where " + tableName.Condition, sourceConnection);
+                        sqlDA = new SqlDataAdapter(queryMaster, sourceConnection);
 
 
                         var ds = new DataSet();
@@ -156,7 +157,7 @@ namespace TestFormDB.ExportDataToTemp
                             if (item.ID == tableName.ID)
                             {
                                 SqlDataAdapter sqlDAdetail;
-                                string query = "Select * From " + item.DetailName;
+                                string query = $"Select  {item.DetailName}.* from  {tableName.Table},{item.DetailName}  Where {tableName.Table}.{item.ConditionDetail} = {item.DetailName}.{item.ConditionDetail}  and  {tableName.Condition}  ";
                                 sqlDAdetail = new SqlDataAdapter(query, sourceConnection);
 
                                 var dsdetail = new DataSet();
@@ -165,35 +166,33 @@ namespace TestFormDB.ExportDataToTemp
                                 //Khởi tạo danh sách Column, dataTable, Khóa chính cột ----> Khi chạy từng vòng lặp
                                 List<string> columnDetail = new List<string>();
                                 Dictionary<string, string> openWithDetail = new Dictionary<string, string>();
-                                DataTable dataTableDetail = new DataTable();
-                                DataTable results = new DataTable();
+                                //DataTable dataTableDetail = new DataTable();
+                                //DataTable results = new DataTable();
 
 
-                                dataTableDetail = dsdetail.Tables[0];
+                                //dataTableDetail = dsdetail.Tables[0];
 
 
-                                var resultsDetail = from tableMaster in dataTable.AsEnumerable()
-                                                    join tableDetail in dataTableDetail.AsEnumerable() on tableMaster[0] equals tableDetail[item.ConditionDetail]
-                                                    select tableDetail;
-                                if (!resultsDetail.Any())
-                                {
-                                    continue;
-                                }
-                                results = resultsDetail.CopyToDataTable();
+                                //var resultsDetail = (from tableMaster in dataTable.AsEnumerable()
+                                //                    join tableDetail in dataTableDetail.AsEnumerable() on tableMaster[0] equals tableDetail[item.ConditionDetail]
+                                //                    select tableDetail).ToList();
+                                //if (!resultsDetail.Any()){
+                                //    continue;
+                                //}
+                                //results = resultsDetail.CopyToDataTable();
                                 //Lấy danh sách Column trong Danh sách
                                 //Lấy Khóa chính trong danh sách Column
-                                foreach (var itemDetail in results.Columns)
+                                foreach (var itemDetail in dsdetail.Tables[0].Columns)
                                 {
                                     openWithDetail.Add(itemDetail.ToString(), itemDetail.ToString());
                                     columnDetail.Add(itemDetail.ToString());
                                 }
 
-                                using (SqlConnection descConnection = new SqlConnection(GetStrConnect.GetStrDsc()))
-                                {
+                                using (SqlConnection descConnection = new SqlConnection(GetStrConnect.GetStrDsc())){
                                     descConnection.Open();
 
-                                    CopyData(descConnection, item.DetailName, results, true, openWithDetail, item.DetailName, null, columnDetail[0]);
-                                    this.Invoke(OnUpdateLog, "Import " + item.DetailName + ", Rows: " + results.Rows.Count);
+                                    CopyData(descConnection, item.DetailName, dsdetail.Tables[0], true, openWithDetail, item.DetailName, null, columnDetail[0]);
+                                    this.Invoke(OnUpdateLog, "Import " + item.DetailName + ", Rows: " + dsdetail.Tables[0].Rows.Count);
                                 }
                             }
                         }
@@ -248,7 +247,19 @@ namespace TestFormDB.ExportDataToTemp
 
                     bulkCopy.WriteToServer(dt);
                     bulkCopy.Close();
-                }
+                }var insertString = InsertString(cloumnMap)[0];
+                var insertStringAlias = InsertString(cloumnMap)[1];
+
+                var keyCol = ColumnKey;
+                if (string.IsNullOrEmpty(keyCol)) keyCol = "DocumentID";
+
+                //change code
+
+                cmd1.CommandText = "INSERT INTO " + tablename + "(" + insertString + ") SELECT " + insertStringAlias + " FROM zzzlvimport" + tablename + " T LEFT JOIN " + tablename + " M ON T." + keyCol + "= M." + keyCol + " WHERE M." + keyCol + " IS NULL";
+
+
+                cmd1.ExecuteNonQuery();
+
                 tran.Commit();
             }
             catch (Exception exp)

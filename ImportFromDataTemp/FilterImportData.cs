@@ -24,8 +24,8 @@ namespace TestFormDB.ImportFromDataTemp
             InitializeComponent();
             dtpfromdate.CustomFormat = "dd/MM/yyyy";
             dtptodate.CustomFormat = "dd/MM/yyyy";
-            dtpfromdate.Value=DateTime.Now;
-            dtptodate.Value=DateTime.Now;
+            dtpfromdate.Value = DateTime.Now;
+            dtptodate.Value = DateTime.Now;
             GetDatabaseList();
         }
 
@@ -251,7 +251,8 @@ namespace TestFormDB.ImportFromDataTemp
                     condition += ")";
                     writer.WriteElementString("Condition", condition);
                 }
-                else{
+                else
+                {
                     if (chkBatchNo.Checked)
                     {
                         string condition = $"{item.Condition} and ";
@@ -271,7 +272,8 @@ namespace TestFormDB.ImportFromDataTemp
                     else
                     {
                         writer.WriteElementString("Condition", item.Condition);
-                    }}
+                    }
+                }
                 //writer.WriteElementString("Condition", item.Condition);
                 foreach (var itemdetail in detail)
                 {
@@ -350,15 +352,25 @@ namespace TestFormDB.ImportFromDataTemp
 
                     // Set up a command with the given query and associate
                     // this with the current connection.
-                    using (SqlCommand cmd = new SqlCommand("SELECT BatchNo,BatchDesc from GL_tblBatchList", con))
+                    using (SqlCommand cmd = new SqlCommand())
                     {
-                        var adapter = new SqlDataAdapter(cmd);
-                        var ds = new DataSet();
-                        adapter.Fill(ds);
+                        cmd.Connection = con;
+                        cmd.CommandText = "SELECT BatchNo,BatchDesc from GL_tblBatchList ";
+                        if (chkDocDate.Checked)
+                        {
+                            cmd.CommandText += "Where " ;
+                           var adapter = new SqlDataAdapter(cmd);
+                            var ds = new DataSet();
+                            adapter.Fill(ds);
 
-                        gridLookUpEditBatch.Properties.DataSource = ds.Tables[0];
-                        gridLookUpEditBatch.Properties.DisplayMember = "BatchNo";
-                        gridLookUpEditBatch.Properties.ValueMember = "BatchNo";
+
+                            gridLookUpEditBatch.Properties.DataSource = ds.Tables[0];
+                            gridLookUpEditBatch.Properties.DisplayMember = "BatchNo";
+                            gridLookUpEditBatch.Properties.ValueMember = "BatchNo";
+                        }
+
+
+
                     }
                 }
 

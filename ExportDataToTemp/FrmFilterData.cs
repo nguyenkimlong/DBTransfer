@@ -260,16 +260,16 @@ namespace TestFormDB.ExportDataToTemp
 
         private void btnNext_Click(object sender, EventArgs e)
         {
-            if (CheckData() == "0")
-            {
-                MessageBox.Show(@"Không có dữ liệu");
-                return;
-            }
-            if (CheckData().Length > 2)
-            {
-                MessageBox.Show(@"Chức năng " + CheckData() + @" có chừng từ bị khóa ");
-                return;
-            }
+            //if (CheckData() == "0")
+            //{
+            //    MessageBox.Show(@"Không có dữ liệu");
+            //    return;
+            //}
+            //if (CheckData().Length > 2)
+            //{
+            //    MessageBox.Show(@"Chức năng " + CheckData() + @" có chừng từ bị khóa ");
+            //    return;
+            //}
             string[] BatchCheck = gridLookUpEditBatch.Text.Split(',');
             XmlWriterSettings settings = new XmlWriterSettings { Indent = true };
 
