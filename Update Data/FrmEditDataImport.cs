@@ -756,7 +756,7 @@ namespace TestFormDB.Update_Data
                 }
                 else
                 {
-                    MessageBox.Show(@"Chức năng này chỉ được dùng cho hóa đơn mua hoặc bán");
+                    MessageBox.Show(@"Chức năng này chỉ được dùng cho hóa đơn mua hàng hoặc bán hàng");
                     return;
                 }
             }
@@ -958,7 +958,7 @@ namespace TestFormDB.Update_Data
                     Dictionary<string, string> language = new Dictionary<string, string>();
                     foreach (DataRow row in dt.Rows)
                     {
-                        if (row["LangID"].ToString() == "vi" && row[3].ToString().IndexOf(newName[1]) > 0)
+                        if (row["LangID"].ToString() == "vi")
                         {
                             string controlName = row["ControlName"].ToString();
                             string customCaption = row["CustomCaption"].ToString();
