@@ -382,6 +382,7 @@
     <EmbeddedResource Include="Update Data\FrmSrcUpdate.resx">
       <DependentUpon>FrmSrcUpdate.cs</DependentUpon>
     </EmbeddedResource>
+    <None Include="AccNetERP.bak" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
